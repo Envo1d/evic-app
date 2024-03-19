@@ -12,6 +12,7 @@ async function bootstrap() {
 		credentials: true,
 		exposedHeaders: 'set-cookie'
 	})
+	app.enableShutdownHooks()
 
 	await app.listen(7000)
 }
