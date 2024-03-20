@@ -20,6 +20,7 @@ export class PrismaService
 		} catch (error) {
 			this.logger.error("Can't connect to database")
 			await this.$disconnect()
+			throw new Error("Can't connect to database")
 		}
 	}
 
