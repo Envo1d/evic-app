@@ -12,7 +12,7 @@ import {
 } from 'class-validator'
 import { TypeCookieSameSite } from './configuration.interface'
 
-enum Environment {
+export enum Environment {
 	Development = 'development',
 	Production = 'production',
 	Test = 'test'
@@ -42,6 +42,10 @@ class EnvironmentVariables {
 
 	@IsEnum(CookieSameSite)
 	COOKIE_SAME_SITE: TypeCookieSameSite
+
+	@IsString()
+	@IsNotEmpty()
+	LOGS_PATH: string
 
 	@IsString()
 	@IsNotEmpty()

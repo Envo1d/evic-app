@@ -6,6 +6,7 @@ export interface AppConfig {
 	secure: boolean
 	domain: string
 	cookie_same_site: TypeCookieSameSite
+	logs_path: string
 }
 
 export interface AuthConfig {
