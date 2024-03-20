@@ -4,7 +4,8 @@ export const configuration = () => ({
 		node_env: process.env.NODE_ENV,
 		secure: Boolean(JSON.parse(process.env.SECURE)),
 		domain: process.env.DOMAIN,
-		cookie_same_site: process.env.COOKIE_SAME_SITE
+		cookie_same_site: process.env.COOKIE_SAME_SITE,
+		logs_path: process.env.LOGS_PATH
 	},
 	auth: {
 		jwt_secret: process.env.JWT_SECRET,
