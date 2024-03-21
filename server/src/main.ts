@@ -30,7 +30,13 @@ async function bootstrap() {
 	const logsDir = configService.get<AppConfig>('app').logs_path
 	mkdir(logsDir)
 		.then(() => logger.log(`Directory '${logsDir}' created.`))
-		.catch(err => logger.error(`Error creating directory: ${err.message}`))
+		.catch(err => {
+			if (err instanceof Error) {
+				if (err.message.includes('file already exists')) {
+					logger.warn('Logs directory already exists')
+				} else logger.error(`Error creating directory: ${err.message}`)
+			}
+		})
 
 	await app.listen(port, () => {
 		logger.log(`Server started on port ${port}`)

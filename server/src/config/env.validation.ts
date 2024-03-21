@@ -29,7 +29,7 @@ class EnvironmentVariables {
 	NODE_ENV: Environment
 
 	@IsNumber()
-	@Min(3000)
+	@Min(0)
 	@Max(65535)
 	PORT: number
 
@@ -91,7 +91,7 @@ class EnvironmentVariables {
 	POSTGRES_HOST: string
 
 	@IsNumber()
-	@Min(5432)
+	@Min(0)
 	@Max(65535)
 	POSTGRES_PORT: number
 
@@ -106,6 +106,19 @@ class EnvironmentVariables {
 	@IsString()
 	@IsNotEmpty()
 	POSTGRES_DB: string
+
+	@IsString()
+	@IsNotEmpty()
+	REDIS_HOST: string
+
+	@IsNumber()
+	@Min(0)
+	@Max(65535)
+	REDIS_PORT: number
+
+	@IsString()
+	@IsNotEmpty()
+	REDIS_PASSWORD: string
 }
 
 export function validate(config: Record<string, unknown>) {
