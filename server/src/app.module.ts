@@ -1,14 +1,14 @@
-import { CacheModule } from '@nestjs/cache-manager'
+import { RedisModule } from '@nestjs-modules/ioredis'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { LoggerModule } from 'nestjs-pino'
 import pino from 'pino'
 import { createStream } from 'rotating-file-stream'
 import { AuthModule } from './auth/auth.module'
-import { getCacheConfig } from './config/cache.config'
 import { configuration } from './config/configuration'
 import { AppConfig } from './config/configuration.interface'
 import { Environment, validate } from './config/env.validation'
+import { getRedisConfig } from './config/redis.config'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
 
@@ -52,11 +52,10 @@ import { UserModule } from './user/user.module'
 					}
 			}
 		}),
-		ConfigModule.forRoot(),
-		CacheModule.registerAsync({
+		RedisModule.forRootAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
-			useFactory: getCacheConfig
+			useFactory: getRedisConfig
 		}),
 		AuthModule,
 		UserModule,
