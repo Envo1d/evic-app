@@ -1,9 +1,11 @@
+import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { LoggerModule } from 'nestjs-pino'
 import pino from 'pino'
 import { createStream } from 'rotating-file-stream'
 import { AuthModule } from './auth/auth.module'
+import { getCacheConfig } from './config/cache.config'
 import { configuration } from './config/configuration'
 import { AppConfig } from './config/configuration.interface'
 import { Environment, validate } from './config/env.validation'
@@ -49,6 +51,12 @@ import { UserModule } from './user/user.module'
 						}
 					}
 			}
+		}),
+		ConfigModule.forRoot(),
+		CacheModule.registerAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: getCacheConfig
 		}),
 		AuthModule,
 		UserModule,

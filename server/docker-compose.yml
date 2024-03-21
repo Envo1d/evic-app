@@ -17,6 +17,9 @@ services:
       - '6379:6379'
     volumes:
       - redisDB:/data
+      - redis.conf:/redis.conf
+    command: bash -c "redis-server --requirepass ${REDIS_PASSWORD}"
 volumes:
   progresDB:
   redisDB:
+  redis.conf:
