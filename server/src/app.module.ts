@@ -10,7 +10,10 @@ import { AppConfig } from './config/configuration.interface'
 import { Environment, validate } from './config/env.validation'
 import { getRedisConfig } from './config/redis.config'
 import { PrismaModule } from './prisma/prisma.module'
+import { TaskModule } from './task/task.module'
+import { TimeBlockModule } from './time-block/time-block.module'
 import { UserModule } from './user/user.module'
+import { TimerModule } from './timer/timer.module';
 
 @Module({
 	imports: [
@@ -59,7 +62,10 @@ import { UserModule } from './user/user.module'
 		}),
 		AuthModule,
 		UserModule,
-		PrismaModule
+		PrismaModule,
+		TaskModule,
+		TimeBlockModule,
+		TimerModule
 	]
 })
 export class AppModule {}
