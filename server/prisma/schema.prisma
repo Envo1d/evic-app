@@ -20,10 +20,11 @@ model User {
   password  String
 
   workInterval   Int? @default(50) @map("work_interval")
-  breakInterval  Int? @default(18) @map("break_interval")
+  breakInterval  Int? @default(10) @map("break_interval")
   intervalsCount Int? @default(7) @map("intervals_count")
 
   tasks             Task[]
+  comments          Comment[]
   timeBlocks        TimeBlock[]
   pomodoroSession   PomodoroSession[]
   projects          Project[]
@@ -34,25 +35,25 @@ model User {
 }
 
 enum Priority {
-  LOW
-  MEDIUM
-  HIGH
+  low
+  medium
+  high
 }
 
 enum Status {
-  COMPLETED
-  INCOMPLETE
-  EXPIRED
-  CANCELED
+  completed
+  incomplete
+  expired
+  canceled
 }
 
 enum Rights {
-  CREATE
-  EDIT
-  DELETE
-  ADD_MEMBER
-  EDIT_MEMBER
-  DELETE_MEMBER
+  create
+  edit
+  delete
+  add_member
+  edit_member
+  delete_member
 }
 
 model ProjectRole {
@@ -92,7 +93,7 @@ model Project {
   name        String
   description String?         @default("")
   imagePath   String?         @default("") @map("image_path")
-  tasks       Task[]
+  //tasks       Task[]
   members     ProjectMember[]
 
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
@@ -108,8 +109,8 @@ model Task {
 
   name        String
   description String?   @default("")
-  priority    Priority? @default(LOW)
-  status      Status?   @default(INCOMPLETE)
+  priority    Priority? @default(low)
+  status      Status?   @default(incomplete)
   imagePath   String?   @default("/default") @map("image_path")
   deadline    DateTime
   color       String?
@@ -117,10 +118,28 @@ model Task {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String  @map("project_id")
+  comments Comment[]
+
+  // project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // projectId String  @map("project_id")
 
   @@map("task")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  text String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String
+
+  @@map("comment")
 }
 
 model TimeBlock {
