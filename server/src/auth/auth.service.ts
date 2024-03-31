@@ -10,8 +10,7 @@ import { verify } from 'argon2'
 import { Response } from 'express'
 import { AppConfig, AuthConfig } from 'src/config/configuration.interface'
 import { UserService } from '../user/user.service'
-import { LoginDto } from './dto/login.dto'
-import { RegisterDto } from './dto/register.dto'
+import { AuthDto } from './dto/auth.dto'
 
 @Injectable()
 export class AuthService {
@@ -32,7 +31,7 @@ export class AuthService {
 		this.REFRESH_TOKEN_NAME = config.get<AuthConfig>('auth').refresh_token_name
 	}
 
-	async login(dto: LoginDto) {
+	async login(dto: AuthDto) {
 		const { password, ...user } = await this.validateUser(dto)
 
 		const tokens = this.issueTokens(user.id)
@@ -40,7 +39,7 @@ export class AuthService {
 		return { user, ...tokens }
 	}
 
-	async register(dto: RegisterDto) {
+	async register(dto: AuthDto) {
 		const oldUser = await this.userService.isExist(dto.email)
 
 		if (oldUser) throw new BadRequestException('Email already in use')
@@ -69,7 +68,7 @@ export class AuthService {
 		}
 	}
 
-	private async validateUser(dto: LoginDto) {
+	private async validateUser(dto: AuthDto) {
 		const user = await this.userService.getByEmail(dto.email)
 
 		if (!user) throw new NotFoundException('User not found')
