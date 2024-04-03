@@ -12,8 +12,7 @@ import {
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
 import { Auth } from './decorators/auth.decorator'
-import { LoginDto } from './dto/login.dto'
-import { RegisterDto } from './dto/register.dto'
+import { AuthDto } from './dto/auth.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -22,10 +21,7 @@ export class AuthController {
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('login')
-	async login(
-		@Body() dto: LoginDto,
-		@Res({ passthrough: true }) res: Response
-	) {
+	async login(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response) {
 		const { refreshToken, ...response } = await this.authService.login(dto)
 		this.authService.addCookie(res, refreshToken)
 
@@ -36,7 +32,7 @@ export class AuthController {
 	@HttpCode(200)
 	@Post('register')
 	async register(
-		@Body() dto: RegisterDto,
+		@Body() dto: AuthDto,
 		@Res({ passthrough: true }) res: Response
 	) {
 		const { refreshToken, ...response } = await this.authService.register(dto)
@@ -54,13 +50,13 @@ export class AuthController {
 		return true
 	}
 
-	@Auth()
 	@HttpCode(200)
 	@Post('refresh-tokens')
 	async getNewToken(
 		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request
 	) {
+		console.log(req.cookies)
 		const token = req.cookies[this.authService.REFRESH_TOKEN_NAME]
 
 		if (!token) {
@@ -70,6 +66,8 @@ export class AuthController {
 
 		const { refreshToken, ...response } =
 			await this.authService.getNewTokens(token)
+
+		this.authService.addCookie(res, refreshToken)
 
 		return response
 	}
