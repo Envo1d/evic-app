@@ -50,13 +50,13 @@ export class AuthController {
 		return true
 	}
 
-	@Auth()
 	@HttpCode(200)
 	@Post('refresh-tokens')
 	async getNewToken(
 		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request
 	) {
+		console.log(req.cookies)
 		const token = req.cookies[this.authService.REFRESH_TOKEN_NAME]
 
 		if (!token) {
@@ -66,6 +66,8 @@ export class AuthController {
 
 		const { refreshToken, ...response } =
 			await this.authService.getNewTokens(token)
+
+		this.authService.addCookie(res, refreshToken)
 
 		return response
 	}
