@@ -1,7 +1,13 @@
 <script setup lang="ts">
+definePageMeta({
+	middleware: 'auth',
+	layout: false,
+})
+
 import { vAutoAnimate } from '@formkit/auto-animate/vue'
 import { toTypedSchema } from '@vee-validate/valibot'
 import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
 
 import type { IAuthForm } from '~/types/auth.types'
 
@@ -23,6 +29,7 @@ const { mutate } = useMutation({
 		$api.auth.main(isLogin ? 'login' : 'register', data),
 	onSuccess() {
 		resetForm()
+		toast.success('Successful login!')
 		push('/app')
 	},
 })
@@ -39,7 +46,7 @@ const changeForm = () => {
 <template>
 	<div class="wrapper">
 		<form @submit="onSubmit" class="form">
-			<FormHeading :title="isLogin ? 'Login' : 'Register'" class="mb-9" />
+			<UiHeading :title="isLogin ? 'Login' : 'Register'" class="mb-9" />
 			<div class="field-wrapper">
 				<GenFormField v-slot="{ componentField }" name="email">
 					<GenFormItem v-auto-animate>

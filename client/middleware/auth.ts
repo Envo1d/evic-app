@@ -3,7 +3,5 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
 	const token = $api.token.getAccessToken()
 
-	if (!token) {
-		return navigateTo('/auth')
-	}
+	if (to.path !== '/' && !token && to.path !== '/auth') return navigateTo('/')
 })

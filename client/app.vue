@@ -1,7 +1,9 @@
 <template>
 	<div>
-		<NuxtPage />
-
+		<NuxtLayout>
+			<NuxtPage />
+		</NuxtLayout>
+		<GenToaster />
 		<VueQueryDevtools v-if="nodeEnv === 'development'" />
 	</div>
 </template>
