@@ -21,8 +21,8 @@ export default defineNuxtConfig({
 		},
 	},
 	routeRules: {
-		'/': { ssr: true, redirect: '/auth' },
-		'/auth': { ssr: true },
+		'/': { ssr: true },
+		'/auth': { ssr: false },
 		'/app/**': { ssr: false },
 	},
 
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
 	},
 	shadcn: {
 		prefix: 'Gen',
-		componentDir: './components/ui',
+		componentDir: './components/gen',
 	},
 	colorMode: {
 		classSuffix: '',
