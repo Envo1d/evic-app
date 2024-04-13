@@ -1,4 +1,3 @@
-import { RedisModule } from '@nestjs-modules/ioredis'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { LoggerModule } from 'nestjs-pino'
@@ -8,12 +7,11 @@ import { AuthModule } from './auth/auth.module'
 import { configuration } from './config/configuration'
 import { AppConfig } from './config/configuration.interface'
 import { Environment, validate } from './config/env.validation'
-import { getRedisConfig } from './config/redis.config'
 import { PrismaModule } from './prisma/prisma.module'
 import { TaskModule } from './task/task.module'
 import { TimeBlockModule } from './time-block/time-block.module'
+import { TimerModule } from './timer/timer.module'
 import { UserModule } from './user/user.module'
-import { TimerModule } from './timer/timer.module';
 
 @Module({
 	imports: [
@@ -54,11 +52,6 @@ import { TimerModule } from './timer/timer.module';
 						}
 					}
 			}
-		}),
-		RedisModule.forRootAsync({
-			imports: [ConfigModule],
-			inject: [ConfigService],
-			useFactory: getRedisConfig
 		}),
 		AuthModule,
 		UserModule,
