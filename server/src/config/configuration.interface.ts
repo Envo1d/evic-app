@@ -30,9 +30,3 @@ export interface DatabaseConfig {
 	password: string
 	db: string
 }
-
-export interface RedisConfig {
-	host: string
-	port: number
-	password: string
-}
