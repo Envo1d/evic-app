@@ -1,5 +1,5 @@
 <template>
-	<div v-if="isFetching || isMutating" class="fixed top-12 right-10 z-50">
+	<div v-if="isFetching || isMutating" class="fixed top-2 right-10 z-50">
 		<UiLoader />
 	</div>
 </template>

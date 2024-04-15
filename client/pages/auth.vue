@@ -16,17 +16,14 @@ const isLogin = ref(true)
 const { $api } = useNuxtApp()
 const { push } = useRouter()
 
-const { errors, defineField, handleSubmit, resetForm } = useForm<IAuthForm>({
+const { handleSubmit, resetForm } = useForm<IAuthForm>({
 	validationSchema: toTypedSchema($api.auth.validationSchema),
 })
-
-const [email, emailAttrs] = defineField('email')
-const [password, passwordAttrs] = defineField('password')
 
 const { mutate } = useMutation({
 	mutationKey: ['auth'],
 	mutationFn: (data: IAuthForm) =>
-		$api.auth.main(isLogin ? 'login' : 'register', data),
+		$api.auth.main(isLogin.value ? 'login' : 'register', data),
 	onSuccess() {
 		resetForm()
 		toast.success('Successful login!')
@@ -37,6 +34,7 @@ const { mutate } = useMutation({
 const onSubmit = handleSubmit(data => {
 	mutate(data)
 })
+
 const changeForm = () => {
 	isLogin.value = !isLogin.value
 	resetForm()
