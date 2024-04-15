@@ -26,7 +26,7 @@ export default defineNuxtConfig({
 		'/app/**': { ssr: false },
 	},
 
-	css: ['~/assets/css/tailwind.css'],
+	css: ['~/assets/css/tailwind.css', '~/assets/css/global.scss'],
 	tailwindcss: {
 		cssPath: ['~/assets/css/tailwind.css', { injectPosition: 'first' }],
 		configPath: 'tailwind.config',
@@ -44,5 +44,15 @@ export default defineNuxtConfig({
 		classSuffix: '',
 		preference: 'system',
 		fallback: 'light',
+	},
+	googleFonts: {
+		subsets: ['cyrillic', 'latin'],
+		display: 'swap',
+		preload: true,
+		families: {
+			'Noto Sans': {
+				wght: [300, 400, 500, 600, 700],
+			},
+		},
 	},
 })

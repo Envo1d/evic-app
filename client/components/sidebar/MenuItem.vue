@@ -4,18 +4,25 @@
 			:to="link"
 			class="flex gap-2.5 items-center py-1.5 mt-2 px-9 transition-colors hover:bg-primary rounded-lg"
 		>
-			{{ icon }}
+			<LayoutDashboard v-if="name === 'Dashboard'" />
+			<KanbanSquare v-if="name === 'Tasks'" />
+			<Timer v-if="name === 'Timer' || name === 'Pomodoro'" />
+			<CalendarRange v-if="name === 'Time blocking'" />
 			<span>{{ name }}</span>
 		</NuxtLink>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import {
+	CalendarRange,
+	KanbanSquare,
+	LayoutDashboard,
+	Timer,
+} from 'lucide-vue-next'
 
 defineProps({
 	link: String,
-	icon: Icon,
 	name: String,
 })
 </script>

@@ -32,18 +32,11 @@
 				</div>
 			</GenDropdownMenuTrigger>
 			<GenDropdownMenuContent class="w-56">
-				<GenDropdownMenuGroup>
-					<GenDropdownMenuItem>
-						<User class="mr-2 h-4 w-4" />
-						<span>Profile</span>
-						<GenDropdownMenuShortcut>⇧⌘P</GenDropdownMenuShortcut>
-					</GenDropdownMenuItem>
-					<GenDropdownMenuItem>
-						<Settings class="mr-2 h-4 w-4" />
-						<span>Settings</span>
-						<GenDropdownMenuShortcut>⌘S</GenDropdownMenuShortcut>
-					</GenDropdownMenuItem>
-				</GenDropdownMenuGroup>
+				<GenDropdownMenuItem>
+					<Settings class="mr-2 h-4 w-4" />
+					<NuxtLink to="/app/settings">Settings</NuxtLink>
+					<GenDropdownMenuShortcut>⌘S</GenDropdownMenuShortcut>
+				</GenDropdownMenuItem>
 				<GenDropdownMenuSeparator />
 				<GenDropdownMenuItem @click="mutate()">
 					<LogOut class="mr-2 h-4 w-4" />
@@ -56,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogOut, Settings, User } from 'lucide-vue-next'
+import { LogOut, Settings } from 'lucide-vue-next'
 
 const { $api } = useNuxtApp()
 const { push } = useRouter()
