@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import * as cookieParser from 'cookie-parser'
 import { mkdir } from 'fs/promises'
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino'
@@ -7,7 +8,9 @@ import { AppModule } from './app.module'
 import { AppConfig, CorsConfig } from './config/configuration.interface'
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, { bufferLogs: true })
+	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+		bufferLogs: true
+	})
 
 	const logger = app.get(Logger)
 	const configService = app.get(ConfigService)
@@ -15,6 +18,7 @@ async function bootstrap() {
 	app.useLogger(logger)
 	app.useGlobalInterceptors(new LoggerErrorInterceptor())
 	app.setGlobalPrefix('api')
+	app.disable('x-powered-by')
 	app.enableShutdownHooks()
 
 	app.use(cookieParser())
