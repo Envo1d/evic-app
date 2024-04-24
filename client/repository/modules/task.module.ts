@@ -1,4 +1,5 @@
-import type { ITaskResponse, TypeTaskFormState } from '~/types/task.types'
+import type { ITaskResponse, TypeTaskFormState } from '@/types/task.types'
+
 import HttpFactory from '../factory'
 
 class TaskModule extends HttpFactory {
@@ -11,6 +12,7 @@ class TaskModule extends HttpFactory {
 	}
 
 	async createTask(data: TypeTaskFormState): Promise<ITaskResponse> {
+		data.deadline = data.createdAt
 		const res = await this.call<ITaskResponse>('POST', `${this.URL}`, data)
 
 		return res

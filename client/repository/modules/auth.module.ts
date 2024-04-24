@@ -1,6 +1,9 @@
 import { email, minLength, object, string } from 'valibot'
-import type { IAuthForm, IAuthResponse } from '~/types/auth.types'
+
+import { IAuthForm, IAuthResponse } from '@/types/auth.types'
+
 import HttpFactory from '../factory'
+
 import TokenModule from './token.module'
 
 class AuthModule extends HttpFactory {
@@ -10,9 +13,9 @@ class AuthModule extends HttpFactory {
 	validationSchema = object({
 		email: string('', [
 			minLength(1, 'Email is required'),
-			email('Invalid email'),
+			email('Invalid email')
 		]),
-		password: string('', [minLength(6, 'Password too short')]),
+		password: string('', [minLength(6, 'Password too short')])
 	})
 
 	async main(

@@ -25,10 +25,5 @@ export const configuration = () => ({
 	cors: {
 		origin: process.env.ORIGIN,
 		credentials: Boolean(JSON.parse(process.env.CREDENTIALS))
-	},
-	redis: {
-		host: process.env.REDIS_HOST,
-		port: parseInt(process.env.REDIS_PORT, 10),
-		password: process.env.REDIS_PASSWORD
 	}
 })

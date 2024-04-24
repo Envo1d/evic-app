@@ -3,20 +3,13 @@ import type { IBase } from './root.types'
 export enum EnumTaskPriority {
 	low = 'low',
 	medium = 'medium',
-	high = 'high',
-}
-
-export enum EnumTaskStatus {
-	completed = 'completed',
-	incomplete = 'incomplete',
-	expired = 'expired',
-	canceled = 'canceled',
+	high = 'high'
 }
 
 export interface ITaskResponse extends IBase {
 	name: string
 	priority?: EnumTaskPriority
-	status?: EnumTaskStatus
+	status?: boolean
 	description?: string
 	imagePath: string
 	deadline: string

@@ -39,13 +39,6 @@ enum Priority {
   high
 }
 
-enum Status {
-  completed
-  incomplete
-  expired
-  canceled
-}
-
 enum Rights {
   create
   edit
@@ -109,7 +102,7 @@ model Task {
   name        String
   description String?   @default("")
   priority    Priority? @default(low)
-  status      Status?   @default(incomplete)
+  status      Boolean?  @default(false)
   imagePath   String?   @default("/default") @map("image_path")
   deadline    DateTime
   color       String?

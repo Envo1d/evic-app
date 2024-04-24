@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Status } from '@prisma/client'
 import { hash } from 'argon2'
 import { startOfDay, subDays } from 'date-fns'
 import { AuthDto } from '../auth/dto/auth.dto'
@@ -96,7 +95,7 @@ export class UserService {
 		const completedTasks = await this.prisma.task.count({
 			where: {
 				userId: id,
-				status: Status.completed
+				status: true
 			}
 		})
 
