@@ -1,9 +1,14 @@
 import type { PropsWithChildren } from "react"
 
-import { Providers } from "./providers"
+import { TanstackQueryClientProvider } from "@/providers/query-client.provider"
+import { AppStoreProvider } from "@/providers/store-provider"
 
 export default function PlatformLayout({
 	children
 }: PropsWithChildren<unknown>) {
-	return <Providers>{children}</Providers>
+	return (
+		<TanstackQueryClientProvider>
+			<AppStoreProvider>{children}</AppStoreProvider>
+		</TanstackQueryClientProvider>
+	)
 }

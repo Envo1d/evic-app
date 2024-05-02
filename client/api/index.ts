@@ -1,20 +1,21 @@
-import { $fetch, type FetchOptions, ofetch } from 'ofetch'
+import { $fetch, type FetchOptions, ofetch } from "ofetch"
 
-import type { IApiInstance } from '@/types/root.types'
+import type { IApiInstance } from "@/types/root.types"
 
-import AuthModule from '@/repository/modules/auth.module'
-import TaskModule from '@/repository/modules/task.module'
-import TimeBlockModule from '@/repository/modules/time-block.module'
-import TimerModule from '@/repository/modules/timer.module'
-import TokenModule from '@/repository/modules/token.module'
-import UserModule from '@/repository/modules/user.module'
+import AuthModule from "@/repository/modules/auth.module"
+import TaskModule from "@/repository/modules/task.module"
+import TeamModule from "@/repository/modules/team.module"
+import TimeBlockModule from "@/repository/modules/time-block.module"
+import TimerModule from "@/repository/modules/timer.module"
+import TokenModule from "@/repository/modules/token.module"
+import UserModule from "@/repository/modules/user.module"
 
 const tokenModule = new TokenModule()
 
 const fetchOptions: FetchOptions = {
 	// TODO: to env
-	baseURL: 'http://localhost:7000/api',
-	credentials: 'include',
+	baseURL: "http://localhost:7000/api",
+	credentials: "include",
 	async onRequest({ options }) {
 		const accessToken = tokenModule.getAccessToken()
 		if (accessToken) {
@@ -26,11 +27,11 @@ const fetchOptions: FetchOptions = {
 	},
 	async onResponse({ response }) {
 		if (response.status === 401) {
-			const res = await ofetch('/auth/refresh-tokens', {
+			const res = await ofetch("/auth/refresh-tokens", {
 				// TODO: to env
-				baseURL: 'http://localhost:7000/api',
-				method: 'POST',
-				credentials: 'include'
+				baseURL: "http://localhost:7000/api",
+				method: "POST",
+				credentials: "include"
 			})
 
 			if (res.status === 401) {
@@ -50,7 +51,8 @@ const api: IApiInstance = {
 	user: new UserModule(apiFetcher),
 	timer: new TimerModule(apiFetcher),
 	timeBlock: new TimeBlockModule(apiFetcher),
-	task: new TaskModule(apiFetcher)
+	task: new TaskModule(apiFetcher),
+	team: new TeamModule(apiFetcher)
 }
 
 export default api

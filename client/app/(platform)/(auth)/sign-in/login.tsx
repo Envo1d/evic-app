@@ -27,7 +27,11 @@ import api from "@/api"
 export function Login() {
 	const form = useForm<IAuthForm>({
 		mode: "onChange",
-		resolver: valibotResolver(api.auth.validationSchema)
+		resolver: valibotResolver(api.auth.validationSchema),
+		defaultValues: {
+			email: "",
+			password: ""
+		}
 	})
 
 	const [parent] = useAutoAnimate()

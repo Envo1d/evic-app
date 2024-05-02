@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { verify } from 'argon2'
 import { Response } from 'express'
-import { AppConfig, AuthConfig } from 'src/config/configuration.interface'
+import { AppConfig, AuthConfig } from '../config/configuration.interface'
 import { UserService } from '../user/user.service'
 import { AuthDto } from './dto/auth.dto'
 
