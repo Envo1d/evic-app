@@ -2,11 +2,15 @@ import { Plus } from "lucide-react"
 
 import { Logo } from "@/components/logo"
 import { Profile } from "@/components/profile"
+import { TeamSelector } from "@/components/team-selector"
 import { Button } from "@/components/ui/button"
+
+import { MobileSidebar } from "./mobile-sidebar"
 
 export function Navbar() {
 	return (
 		<nav className="fixed z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
+			<MobileSidebar />
 			<div className="flex items-center gap-x-4">
 				<div className="hidden md:flex">
 					<Logo />
@@ -27,7 +31,7 @@ export function Navbar() {
 				</Button>
 			</div>
 			<div className="ml-auto flex items-center gap-x-2">
-				<p>Organization switcher</p>
+				<TeamSelector />
 				<Profile />
 			</div>
 		</nav>

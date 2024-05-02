@@ -37,12 +37,8 @@ export class TaskController {
 	@HttpCode(200)
 	@Put(':id')
 	@Auth()
-	async update(
-		@Body() dto: TaskDto,
-		@CurrentUser('id') userId: string,
-		@Param('id') id: string
-	) {
-		return this.taskService.update(dto, id, userId)
+	async update(@Body() dto: TaskDto, @Param('id') id: string) {
+		return this.taskService.update(dto, id)
 	}
 
 	@HttpCode(200)

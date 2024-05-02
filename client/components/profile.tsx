@@ -29,7 +29,7 @@ export function Profile() {
 	const { mutate } = useMutation({
 		mutationKey: ["logout"],
 		mutationFn: () => api.auth.logout(),
-		onSuccess: () => router.push("/auth")
+		onSuccess: () => router.push("/sign-in")
 	})
 
 	return (
@@ -39,7 +39,7 @@ export function Profile() {
 					<DropdownMenuTrigger asChild>
 						<Avatar className="cursor-pointer">
 							<AvatarImage src="/default" />
-							<AvatarFallback className="bg-violet-500 hover:bg-violet-900 transition-colors text-white font-medium text-xl">
+							<AvatarFallback className="bg-violet-500 hover:bg-violet-900 transition-colors text-white font-medium text-xl capitalize">
 								{data?.user.nickname?.charAt(0) ||
 									data?.user.firstName?.charAt(0) ||
 									data?.user.email.charAt(0)}

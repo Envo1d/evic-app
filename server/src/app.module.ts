@@ -12,6 +12,8 @@ import { TaskModule } from './task/task.module'
 import { TimeBlockModule } from './time-block/time-block.module'
 import { TimerModule } from './timer/timer.module'
 import { UserModule } from './user/user.module'
+import { TeamModule } from './team/team.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
 	imports: [
@@ -58,7 +60,9 @@ import { UserModule } from './user/user.module'
 		PrismaModule,
 		TaskModule,
 		TimeBlockModule,
-		TimerModule
+		TimerModule,
+		TeamModule,
+		ProjectModule
 	]
 })
 export class AppModule {}

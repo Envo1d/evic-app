@@ -20,14 +20,16 @@ import { Input } from "@/components/ui/input"
 
 import { IAuthForm } from "@/types/auth.types"
 
-import { DASHBOARD_PAGES } from "@/config/pages-url.config"
-
 import api from "@/api"
 
 export function Register() {
 	const form = useForm<IAuthForm>({
 		mode: "onChange",
-		resolver: valibotResolver(api.auth.validationSchema)
+		resolver: valibotResolver(api.auth.validationSchema),
+		defaultValues: {
+			email: "",
+			password: ""
+		}
 	})
 
 	const [parent] = useAutoAnimate()
@@ -40,7 +42,7 @@ export function Register() {
 		onSuccess() {
 			toast.success("Successfully login!")
 			form.reset()
-			push(DASHBOARD_PAGES.HOME)
+			push("/team-selection")
 		}
 	})
 
