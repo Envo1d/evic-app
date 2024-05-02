@@ -1,7 +1,8 @@
 import type {
 	ITimeBlockResponse,
-	TypeTimeBlockFormState,
-} from '~/types/time-block.types'
+	TypeTimeBlockFormState
+} from '@/types/time-block.types'
+
 import HttpFactory from '../factory'
 
 class TimeBlockModule extends HttpFactory {

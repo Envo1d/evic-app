@@ -12,22 +12,24 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  email     String  @unique
-  firstName String? @map("first_name")
-  lastName  String? @map("last_name")
-  nickname  String?
-  password  String
+  email      String  @unique
+  firstName  String? @map("first_name")
+  lastName   String? @map("last_name")
+  nickname   String?
+  password   String
+  avatarPath String?
 
   workInterval   Int? @default(50) @map("work_interval")
   breakInterval  Int? @default(10) @map("break_interval")
   intervalsCount Int? @default(7) @map("intervals_count")
 
-  tasks             Task[]
-  comments          Comment[]
-  timeBlocks        TimeBlock[]
-  pomodoroSession   PomodoroSession[]
-  projects          Project[]
-  projectMembership ProjectMember[]
+  comments        Comment[]
+  timeBlocks      TimeBlock[]
+  pomodoroSession PomodoroSession[]
+  projects        Project[]
+  teams           Team[]
+  teamMembership  TeamMember[]
+  tasks           Task[]
 
   @@index([email], type: Hash)
   @@map("user")
@@ -39,13 +41,6 @@ enum Priority {
   high
 }
 
-enum Status {
-  completed
-  incomplete
-  expired
-  canceled
-}
-
 enum Rights {
   create
   edit
@@ -55,33 +50,20 @@ enum Rights {
   delete_member
 }
 
-model ProjectRole {
+model TeamRole {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name   String         @unique
-  rights Rights[]       @default([])
-  member ProjectMember?
+  name   String
+  rights Rights[] @default([])
 
-  @@map("project_role")
-}
+  member TeamMember[]
 
-model ProjectMember {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  team   Team   @relation(fields: [teamId], references: [id])
+  teamId String
 
-  role   ProjectRole @relation(fields: [roleId], references: [id])
-  roleId String      @unique @map("role_id")
-
-  project   Project? @relation(fields: [projectId], references: [id])
-  projectId String?  @map("project_id")
-
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String? @map("user_id")
-
-  @@map("project_member")
+  @@map("team_role")
 }
 
 model Project {
@@ -89,16 +71,31 @@ model Project {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name        String
-  description String?         @default("")
-  imagePath   String?         @default("") @map("image_path")
-  //tasks       Task[]
-  members     ProjectMember[]
+  name      String
+  imagePath String?         @default("") @map("image_path")
+  tasks     Task[]
+  members   ProjectMember[]
 
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId String @map("owner_id")
+  owner   User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String  @map("owner_id")
+  team    Team?   @relation(fields: [teamId], references: [id])
+  teamId  String?
 
   @@map("project")
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?  @map("project_id")
+
+  teamMember   TeamMember? @relation(fields: [teamMemberId], references: [id])
+  teamMemberId String?     @map("team_member_id")
+
+  @@map("projec_member")
 }
 
 model Task {
@@ -109,18 +106,18 @@ model Task {
   name        String
   description String?   @default("")
   priority    Priority? @default(low)
-  status      Status?   @default(incomplete)
+  status      Boolean?  @default(false)
   imagePath   String?   @default("/default") @map("image_path")
   deadline    DateTime
   color       String?
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @map("user_id")
-
   comments Comment[]
 
-  // project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  // projectId String  @map("project_id")
+  taskExecutor User   @relation(fields: [userId], references: [id])
+  userId       String @unique @map("user_id")
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
 
   @@map("task")
 }
@@ -133,12 +130,48 @@ model Comment {
   text String
 
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @map("user_id")
 
   task   Task   @relation(fields: [taskId], references: [id])
-  taskId String
+  taskId String @map("task_id")
 
   @@map("comment")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projectMembership ProjectMember[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String @map("team_id")
+
+  role   TeamRole? @relation(fields: [roleId], references: [id])
+  roleId String?
+
+  @@map("team_member")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name String
+
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId String @map("creator_id")
+
+  members  TeamMember[]
+  roles    TeamRole[]
+  projects Project[]
+
+  @@map("team")
 }
 
 model TimeBlock {
@@ -180,8 +213,9 @@ model PomodoroRound {
   totalSeconds Int      @map("total_seconds")
   isCompleted  Boolean? @default(false) @map("is_completed")
 
-  pomodoroSession   PomodoroSession @relation(fields: [pomodoroSessionId], references: [id], onDelete: Cascade)
-  pomodoroSessionId String          @map("pomodoro_session_id")
+  pomodoroSession PomodoroSession @relation(fields: [pomodoroSessionId], references: [id], onDelete: Cascade)
+
+  pomodoroSessionId String @map("pomodoro_session_id")
 
   @@map("pomodoro_round")
 }
