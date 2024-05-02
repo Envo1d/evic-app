@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { TaskDto } from './dto/task.dto'
 
 @Injectable()
@@ -7,32 +7,59 @@ export class TaskService {
 	constructor(private prisma: PrismaService) {}
 
 	async getAll(userId: string) {
-		return this.prisma.task.findMany({
+		return this.prisma.user.findMany({
 			where: {
-				userId
-			}
-		})
-	}
-
-	async create(dto: TaskDto, userId: string) {
-		const { deadline, ...rest } = dto
-		return this.prisma.task.create({
-			data: {
-				...rest,
-				deadline: new Date(deadline),
-				user: {
-					connect: {
-						id: userId
+				id: userId
+			},
+			select: {
+				tasks: {
+					include: {
+						project: {
+							include: {
+								team: {
+									select: {
+										name: true,
+										id: true
+									}
+								}
+							}
+						}
 					}
 				}
 			}
 		})
 	}
 
-	async update(dto: Partial<TaskDto>, taskId: string, userId: string) {
+	async create(dto: TaskDto, userId: string) {
+		const { deadline, projectId, ...rest } = dto
+		return this.prisma.task.create({
+			data: {
+				...rest,
+				deadline: new Date(deadline),
+				taskExecutor: {
+					connect: {
+						id: userId
+					}
+				},
+				project: {
+					connect: {
+						id: projectId
+					}
+				}
+			},
+			include: {
+				taskExecutor: {
+					select: {
+						id: true
+					}
+				}
+			}
+		})
+	}
+
+	async update(dto: Partial<TaskDto>, taskId: string) {
 		return this.prisma.task.update({
 			where: {
-				userId,
 				id: taskId
 			},
 			data: dto

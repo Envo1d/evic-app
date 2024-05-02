@@ -1,8 +1,9 @@
 import type {
 	ITimerSessionResponse,
 	TypeTimerRoundFormState,
-	TypeTimerSessionFormState,
-} from '~/types/timer.types'
+	TypeTimerSessionFormState
+} from '@/types/timer.types'
+
 import HttpFactory from '../factory'
 
 class TimerModule extends HttpFactory {

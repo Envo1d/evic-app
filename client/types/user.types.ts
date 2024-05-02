@@ -1,10 +1,11 @@
-import type { IBase } from './root.types'
+import type { IBase } from "./root.types"
 
 export interface IUser extends IBase {
 	email: string
 	nickname?: string
 	firstName?: string
 	lastName?: string
+	avatarPath?: string
 
 	workInterval?: number
 	breakInterval?: number
@@ -13,10 +14,6 @@ export interface IUser extends IBase {
 
 export interface IProfileResponse {
 	user: IUser
-	statistics: {
-		label: string
-		value: string
-	}[]
 }
 
-export type TypeUserForm = Omit<IUser, 'id'> & { password?: string }
+export type TypeUserForm = Omit<IUser, "id"> & { password?: string }
