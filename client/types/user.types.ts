@@ -12,8 +12,6 @@ export interface IUser extends IBase {
 	intervalsCount?: number
 }
 
-export interface IProfileResponse {
-	user: IUser
-}
+export interface IProfileResponse extends IUser {}
 
 export type TypeUserForm = Omit<IUser, "id"> & { password?: string }

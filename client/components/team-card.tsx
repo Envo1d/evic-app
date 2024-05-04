@@ -15,7 +15,7 @@ export function TeamCard({ name, id }: ITeamCard) {
 
 	const click = () => {
 		setActiveTeamId(id)
-		push("/app")
+		push("/team")
 	}
 
 	return (

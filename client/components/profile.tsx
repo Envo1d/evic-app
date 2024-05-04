@@ -40,19 +40,19 @@ export function Profile() {
 						<Avatar className="cursor-pointer">
 							<AvatarImage src="/default" />
 							<AvatarFallback className="bg-violet-500 hover:bg-violet-900 transition-colors text-white font-medium text-xl capitalize">
-								{data?.user.nickname?.charAt(0) ||
-									data?.user.firstName?.charAt(0) ||
-									data?.user.email.charAt(0)}
+								{data?.nickname?.charAt(0) ||
+									data?.firstName?.charAt(0) ||
+									data?.email.charAt(0)}
 							</AvatarFallback>
 						</Avatar>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-56">
 						<DropdownMenuLabel className="text-ellipsis overflow-hidden">
-							{data?.user.nickname
-								? data?.user.firstName && data?.user.lastName
-									? `${data.user.nickname} (${data.user.firstName} ${data.user.lastName})`
-									: `${data.user.nickname}`
-								: data?.user.email}
+							{data?.nickname
+								? data?.firstName && data?.lastName
+									? `${data.nickname} (${data.firstName} ${data.lastName})`
+									: `${data.nickname}`
+								: data?.email}
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={() => router.push("/app/settings")}>

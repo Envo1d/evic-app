@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 
 import { AccordionContent, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { useAppStore } from "@/providers/store-provider"
 
@@ -89,7 +90,9 @@ export function NavItem({ isActive, team }: NavItemProps) {
 						onClick={() => onClick(route.href)}
 						className={cn(
 							"w-full font-medium justify-start pl-10 mb-1",
-							pathname === route.href && "bg-sky-500/10 text-sky-700"
+							pathname === route.href &&
+								activeTeamId === team.id &&
+								"bg-sky-500/10 text-sky-700"
 						)}
 						variant="ghost"
 					>
@@ -99,5 +102,16 @@ export function NavItem({ isActive, team }: NavItemProps) {
 				))}
 			</AccordionContent>
 		</AccordionItem>
+	)
+}
+
+NavItem.Skeleton = function SkeletonNavItem() {
+	return (
+		<div className="flex items-center gap-x-2">
+			<div className="w-10 h-10 relative shrink-0">
+				<Skeleton className="w-14 h-7 absolute" />
+			</div>
+			<Skeleton className="h-10 w-full" />
+		</div>
 	)
 }

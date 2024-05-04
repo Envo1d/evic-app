@@ -19,6 +19,7 @@ export interface IUserTeams {
 export interface ITeamResponse extends IBase {
 	name: string
 	creator: IUser
+	creatorId: string
 	members?: ITeamMemberResponse[]
 	roles?: ITeamRoleResponse[]
 	projects?: number
@@ -50,10 +51,30 @@ export interface ITeamCreateRoleForm {
 	teamId: string
 }
 
-export interface ITeamAddMemberForm {
+export type TypeTeamCreateRoleFormState = Partial<ITeamCreateRoleForm>
+
+export interface ITeamInviteResponse extends IBase {
+	candidateId?: string
+	candidate?: IUser
+	team?: ITeamResponse
+	teamId?: string
+}
+
+export interface ITeamSetMemberRoleForm {
 	userId: string
 	teamId: string
 	roleId: string
+}
+
+export interface ITeamUpdateMemberRoleForm {
+	memberId: string
+	teamId: string
+	roleId: string
+}
+
+export interface ITeamAddMemberForm {
+	candidateId: string
+	teamId: string
 }
 
 export interface ITeamRemoveMemberForm {

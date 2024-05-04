@@ -16,6 +16,10 @@ import { AddMemberDto } from './dto/add-member.dto'
 import { CreateTeamRoleDto } from './dto/create-team-role.dto'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { RemoveMemberDto } from './dto/remove-member.dto'
+import {
+	SetMemberRoleDto,
+	UpdateMemberRoleDto
+} from './dto/update-member-role.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
 import { TeamService } from './team.service'
 
@@ -35,16 +39,11 @@ export class TeamController {
 	@HttpCode(200)
 	@Post('create-role')
 	@Auth()
-	async createRole(@Body() dto: CreateTeamRoleDto) {
-		return this.teamService.createRole(dto)
-	}
-
-	@UsePipes(new ValidationPipe())
-	@HttpCode(200)
-	@Post('add-member')
-	@Auth()
-	async addMember(@Body() dto: AddMemberDto) {
-		return this.teamService.addMember(dto)
+	async createRole(
+		@Body() dto: CreateTeamRoleDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.createRole(dto, userId)
 	}
 
 	@Get('team-roles/:id')
@@ -56,10 +55,94 @@ export class TeamController {
 		return this.teamService.getTeamRoles(teamId, userId)
 	}
 
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Post('set-role')
+	@Auth()
+	async setMemberRole(
+		@Body() dto: SetMemberRoleDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.setMemberRole(dto, userId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Post('update-role')
+	@Auth()
+	async updateMemberRole(
+		@Body() dto: UpdateMemberRoleDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.updateMemberRole(dto, userId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Post('invite-member')
+	@Auth()
+	async inviteMember(
+		@Body() dto: AddMemberDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.inviteMember(userId, dto)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Put('accept-invite/:id')
+	@Auth()
+	async acceptInvite(
+		@Param('id') inviteId: string,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.acceptInvite(inviteId, userId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Put('decline-invite/:id')
+	@Auth()
+	async declineInvite(
+		@Param('id') inviteId: string,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.declineInvite(inviteId, userId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Get('invitations/:teamId')
+	@Auth()
+	async getTeamInvitations(
+		@CurrentUser('id') userId: string,
+		@Param('teamId') teamId: string
+	) {
+		return this.teamService.getTeamInvitations(teamId, userId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Get('user-invitations')
+	@Auth()
+	async getUserInvitations(@CurrentUser('id') userId: string) {
+		return this.teamService.getUserInvitations(userId)
+	}
+
 	@HttpCode(200)
 	@Delete('remove-member/:team-id')
 	@Auth()
 	async removeMember(
+		@Param('team-id') teamId: string,
+		@Body() dto: RemoveMemberDto
+	) {
+		return this.teamService.removeMember(teamId, dto)
+	}
+
+	@HttpCode(200)
+	@Delete('leave-team/:team-id')
+	@Auth()
+	async leaveTeam(
 		@Param('team-id') teamId: string,
 		@Body() dto: RemoveMemberDto
 	) {
