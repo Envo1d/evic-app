@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
-import { UseFormReset } from 'react-hook-form'
+import { useEffect } from "react"
+import { UseFormReset } from "react-hook-form"
 
-import { TypeUserForm } from '@/types/user.types'
+import { TypeUserForm } from "@/types/user.types"
 
-import { useProfile } from './useProfile'
+import { useProfile } from "./useProfile"
 
 export function useInitialSettings(reset: UseFormReset<TypeUserForm>) {
 	const { data, isSuccess } = useProfile()
@@ -11,13 +11,13 @@ export function useInitialSettings(reset: UseFormReset<TypeUserForm>) {
 	useEffect(() => {
 		if (isSuccess && data)
 			reset({
-				email: data.user.email,
-				firstName: data.user.firstName,
-				lastName: data.user.lastName,
-				nickname: data.user.nickname,
-				breakInterval: data.user.breakInterval,
-				intervalsCount: data.user.intervalsCount,
-				workInterval: data.user.workInterval
+				email: data.email,
+				firstName: data.firstName,
+				lastName: data.lastName,
+				nickname: data.nickname,
+				breakInterval: data.breakInterval,
+				intervalsCount: data.intervalsCount,
+				workInterval: data.workInterval
 			})
 	}, [isSuccess])
 }

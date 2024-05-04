@@ -59,7 +59,7 @@ export function TeamSelection() {
 		onSuccess(res) {
 			toast.success(`Team "${res.name}" created!`)
 			setActiveTeamId(res.id)
-			push("/app")
+			push("/team")
 		}
 	})
 

@@ -89,7 +89,7 @@ export class UserService {
 		const { password, ...rest } = profile
 
 		return {
-			user: rest
+			...rest
 		}
 	}
 }
