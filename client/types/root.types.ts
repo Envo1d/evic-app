@@ -4,6 +4,7 @@ import { UseFormWatch } from "react-hook-form"
 
 import { ITaskResponse, TypeTaskFormState } from "./task.types"
 import AuthModule from "@/repository/modules/auth.module"
+import ProjectModule from "@/repository/modules/project.module"
 import TaskModule from "@/repository/modules/task.module"
 import TeamModule from "@/repository/modules/team.module"
 import TimeBlockModule from "@/repository/modules/time-block.module"
@@ -25,6 +26,7 @@ export interface IApiInstance {
 	timeBlock: TimeBlockModule
 	task: TaskModule
 	team: TeamModule
+	project: ProjectModule
 }
 
 export interface IMenuItem {

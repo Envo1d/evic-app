@@ -3,6 +3,7 @@ import { $fetch, type FetchOptions, ofetch } from "ofetch"
 import type { IApiInstance } from "@/types/root.types"
 
 import AuthModule from "@/repository/modules/auth.module"
+import ProjectModule from "@/repository/modules/project.module"
 import TaskModule from "@/repository/modules/task.module"
 import TeamModule from "@/repository/modules/team.module"
 import TimeBlockModule from "@/repository/modules/time-block.module"
@@ -52,7 +53,8 @@ const api: IApiInstance = {
 	timer: new TimerModule(apiFetcher),
 	timeBlock: new TimeBlockModule(apiFetcher),
 	task: new TaskModule(apiFetcher),
-	team: new TeamModule(apiFetcher)
+	team: new TeamModule(apiFetcher),
+	project: new ProjectModule(apiFetcher)
 }
 
 export default api

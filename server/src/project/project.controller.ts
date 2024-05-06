@@ -15,6 +15,7 @@ import { CurrentUser } from '../auth/decorators/user.decorator'
 import { AddProjectMemberDto } from './dto/add-member.dto'
 import { CreateProjectDto } from './dto/create-project.dto'
 import { FindProjectDto } from './dto/find-project.dto'
+import { RemoveProjectMemberDto } from './dto/remove-member.dto'
 import { RemoveProjectDto } from './dto/remove-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectService } from './project.service'
@@ -35,8 +36,22 @@ export class ProjectController {
 	@HttpCode(200)
 	@Auth()
 	@UsePipes(new ValidationPipe())
-	addMember(@Body() dto: AddProjectMemberDto) {
-		return this.projectService.addMember(dto)
+	addMember(
+		@Body() dto: AddProjectMemberDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.projectService.addMember(dto, userId)
+	}
+
+	@Delete('delete-member')
+	@HttpCode(200)
+	@Auth()
+	@UsePipes(new ValidationPipe())
+	deleteMember(
+		@Body() dto: RemoveProjectMemberDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.projectService.deleteMember(dto, userId)
 	}
 
 	@Auth()

@@ -23,14 +23,11 @@ model User {
   breakInterval  Int? @default(10) @map("break_interval")
   intervalsCount Int? @default(7) @map("intervals_count")
 
-  comments        Comment[]
   timeBlocks      TimeBlock[]
   pomodoroSession PomodoroSession[]
-  projects        Project[]
   teams           Team[]
   teamInvitations TeamInvitation[]
   teamMembership  TeamMember[]
-  tasks           Task[]
 
   @@index([email], type: Hash)
   @@map("user")
@@ -51,22 +48,6 @@ enum Rights {
   delete_member
 }
 
-model TeamRole {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  name   String
-  rights Rights[] @default([])
-
-  member TeamMember[]
-
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId String
-
-  @@map("team_role")
-}
-
 model Project {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @map("created_at")
@@ -77,10 +58,10 @@ model Project {
   tasks     Task[]
   members   ProjectMember[]
 
-  owner   User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId String  @map("owner_id")
-  team    Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId  String?
+  owner   TeamMember @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String     @map("owner_id")
+  team    Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId  String     @map("team_id")
 
   @@map("project")
 }
@@ -96,7 +77,10 @@ model ProjectMember {
   teamMember   TeamMember? @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
   teamMemberId String?     @map("team_member_id")
 
-  @@map("projec_member")
+  taskExecutions TaskExecutor[]
+  createdTasks   Task[]
+
+  @@map("project_member")
 }
 
 model Task {
@@ -114,13 +98,30 @@ model Task {
 
   comments Comment[]
 
-  taskExecutor User?   @relation(fields: [userId], references: [id])
-  userId       String? @unique @map("user_id")
-
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String  @map("project_id")
 
+  taskExecutor   TaskExecutor?
+  taskExecutorId String?       @map("task_executor_id")
+
+  creactor        ProjectMember @relation(fields: [projectMemberId], references: [id], onDelete: Cascade)
+  projectMemberId String        @map("project_executor_id")
+
   @@map("task")
+}
+
+model TaskExecutor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  task   Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String? @unique @map("task_id")
+
+  projectMember   ProjectMember? @relation(fields: [projectMemberId], references: [id], onDelete: Cascade)
+  projectMemberId String?        @map("project_member_id")
+
+  @@map("task_executor")
 }
 
 model Comment {
@@ -130,44 +131,13 @@ model Comment {
 
   text String
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @map("user_id")
+  teamMember   TeamMember @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  teamMemberId String     @map("team_member_id")
 
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId String @map("task_id")
 
   @@map("comment")
-}
-
-model TeamMember {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  projectMembership ProjectMember[]
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @map("user_id")
-
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId String @map("team_id")
-
-  role   TeamRole? @relation(fields: [roleId], references: [id])
-  roleId String?
-
-  @@map("team_member")
-}
-
-model TeamInvitation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId String @map("team_id")
-
-  candidate   User   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  candidateId String
 }
 
 model Team {
@@ -186,6 +156,58 @@ model Team {
   invitations TeamInvitation[]
 
   @@map("team")
+}
+
+model TeamRole {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name   String
+  rights Rights[] @default([])
+
+  member TeamMember[]
+
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String @map("team_id")
+
+  @@map("team_role")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projectMembership ProjectMember[]
+  projectsOwnering  Project[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String @map("team_id")
+
+  role   TeamRole? @relation(fields: [roleId], references: [id])
+  roleId String?   @map("team_role")
+
+  comments Comment[]
+
+  @@map("team_member")
+}
+
+model TeamInvitation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String @map("team_id")
+
+  candidate   User   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId String @map("candidate_id")
+
+  @@map("team_invitation")
 }
 
 model TimeBlock {

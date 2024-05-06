@@ -6,10 +6,6 @@ export class UpdateProjectDto {
 	name?: string
 
 	@IsString()
-	@IsOptional()
-	imagePath?: string
-
-	@IsString()
 	@IsNotEmpty()
 	teamId: string
 }

@@ -60,6 +60,19 @@ export interface ITeamInviteResponse extends IBase {
 	teamId?: string
 }
 
+export interface ITeamInvitationsTable {
+	invitationId?: string
+	candidate?: {
+		id?: string
+		email?: string
+		nickname?: string
+		firstName?: string
+		lastName?: string
+		avatarPath?: string
+	}
+	candidateId?: string
+}
+
 export interface ITeamSetMemberRoleForm {
 	userId: string
 	teamId: string
@@ -73,11 +86,36 @@ export interface ITeamUpdateMemberRoleForm {
 }
 
 export interface ITeamAddMemberForm {
-	candidateId: string
+	candidateEmail: string
 	teamId: string
 }
 
 export interface ITeamRemoveMemberForm {
 	memberId: string
 	userId: string
+}
+
+export interface ITeamMemberTableData {
+	user: ITeamMember
+	role: {
+		id: string
+		name: string
+	}
+	joined: string
+}
+
+export interface ITeamMember {
+	id: string
+	nickname?: string
+	email: string
+	firstName?: string
+	lastName?: string
+	avatarPath?: string
+	memberId?: string
+}
+
+export interface ITeamDeleteInviteForm {
+	invitationId: string
+	candidateId: string
+	teamId: string
 }

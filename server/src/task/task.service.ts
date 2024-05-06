@@ -7,54 +7,54 @@ export class TaskService {
 	constructor(private prisma: PrismaService) {}
 
 	async getAll(userId: string) {
-		return this.prisma.user.findMany({
-			where: {
-				id: userId
-			},
-			select: {
-				tasks: {
-					include: {
-						project: {
-							include: {
-								team: {
-									select: {
-										name: true,
-										id: true
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		})
+		// return this.prisma.projectMember.findMany({
+		// 	where: {
+		// 		id: userId
+		// 	},
+		// 	select: {
+		// 		taskExecutions: {
+		// 			include: {
+		// 				project: {
+		// 					include: {
+		// 						team: {
+		// 							select: {
+		// 								name: true,
+		// 								id: true
+		// 							}
+		// 						}
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// })
 	}
 
 	async create(dto: TaskDto, userId: string) {
-		const { deadline, projectId, ...rest } = dto
-		return this.prisma.task.create({
-			data: {
-				...rest,
-				deadline: new Date(deadline),
-				taskExecutor: {
-					connect: {
-						id: userId
-					}
-				},
-				project: {
-					connect: {
-						id: projectId
-					}
-				}
-			},
-			include: {
-				taskExecutor: {
-					select: {
-						id: true
-					}
-				}
-			}
-		})
+		// const { deadline, projectId, ...rest } = dto
+		// return this.prisma.task.create({
+		// 	data: {
+		// 		...rest,
+		// 		deadline: new Date(deadline),
+		// 		taskExecutor: {
+		// 			connect: {
+		// 				id: userId
+		// 			}
+		// 		},
+		// 		project: {
+		// 			connect: {
+		// 				id: projectId
+		// 			}
+		// 		}
+		// 	},
+		// 	include: {
+		// 		taskExecutor: {
+		// 			select: {
+		// 				id: true
+		// 			}
+		// 		}
+		// 	}
+		// })
 	}
 
 	async update(dto: Partial<TaskDto>, taskId: string) {

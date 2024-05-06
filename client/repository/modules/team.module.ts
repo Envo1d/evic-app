@@ -4,6 +4,7 @@ import {
 	ITeamAddMemberForm,
 	ITeamCreateForm,
 	ITeamCreateRoleForm,
+	ITeamDeleteInviteForm,
 	ITeamInviteResponse,
 	ITeamMemberResponse,
 	ITeamRemoveMemberForm,
@@ -97,8 +98,18 @@ class TeamModule extends HttpFactory {
 
 	async declineInvite(inviteId: string): Promise<boolean> {
 		const res = await this.call<boolean>(
-			"PUT",
+			"DELETE",
 			`${this.URL}/decline-invite/${inviteId}`
+		)
+
+		return res
+	}
+
+	async deleteInvite(data: ITeamDeleteInviteForm): Promise<boolean> {
+		const res = await this.call<boolean>(
+			"DELETE",
+			`${this.URL}/delete-invite`,
+			data
 		)
 
 		return res

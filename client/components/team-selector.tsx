@@ -122,7 +122,7 @@ export function TeamSelector() {
 											)}
 										>
 											<Building
-												className="bg-gradient-to-tr from-violet-500 to-blue-500 w-11 h-11 rounded-md p-1"
+												className="bg-gradient-to-tr from-violet-500 to-blue-500 w-11 h-11 rounded-md p-1 text-white"
 												size={35}
 											/>
 											<p className="font-semibold truncate">{team.name}</p>

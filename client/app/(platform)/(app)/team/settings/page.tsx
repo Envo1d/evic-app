@@ -5,7 +5,7 @@ import { NO_INDEX_PAGE } from "@/config/site"
 import { TeamSettings } from "./team-settings"
 
 export const metadata: Metadata = {
-	title: "",
+	title: "Settings",
 	...NO_INDEX_PAGE
 }
 
