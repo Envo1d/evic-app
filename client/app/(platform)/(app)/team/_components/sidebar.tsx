@@ -62,7 +62,13 @@ export function Sidebar() {
 						team={team}
 					/>
 				))}
-				{teamList?.member.map(team => <p key={team.id}>{team.name}</p>)}
+				{teamList?.member.map(team => (
+					<NavItem
+						key={team.id}
+						isActive={activeTeamId === team.id}
+						team={team}
+					/>
+				))}
 			</Accordion>
 		</aside>
 	)

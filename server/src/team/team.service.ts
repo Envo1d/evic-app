@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { Rights } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
-import { AddMemberDto } from './dto/add-member.dto'
+import { UserService } from '../user/user.service'
+import { AddMemberDto, DeleteInvitedMemberDto } from './dto/add-member.dto'
 import { CreateTeamRoleDto } from './dto/create-team-role.dto'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { RemoveMemberDto } from './dto/remove-member.dto'
@@ -13,7 +14,10 @@ import { UpdateTeamDto } from './dto/update-team.dto'
 
 @Injectable()
 export class TeamService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private userService: UserService
+	) {}
 
 	async create(dto: CreateTeamDto, userId: string) {
 		return await this.prisma.team.create({
@@ -178,12 +182,16 @@ export class TeamService {
 
 	async inviteMember(userId: string, dto: AddMemberDto) {
 		const user = await this.isCreatorOrMember(dto.teamId, userId)
+
+		const candidate = await this.userService.getByEmail(dto.candidateEmail)
+		if (!candidate) throw new BadRequestException('User not found')
+
 		if (user.creator) {
 			return await this.prisma.teamInvitation.create({
 				data: {
 					candidate: {
 						connect: {
-							id: dto.candidateId
+							id: candidate.id
 						}
 					},
 					team: {
@@ -204,7 +212,7 @@ export class TeamService {
 					data: {
 						candidate: {
 							connect: {
-								id: dto.candidateId
+								email: dto.candidateEmail
 							}
 						},
 						team: {
@@ -212,6 +220,34 @@ export class TeamService {
 								id: dto.teamId
 							}
 						}
+					}
+				})
+			} else throw new BadRequestException("You don't have enough rights")
+		}
+	}
+
+	async deleteInvitedMember(userId: string, dto: DeleteInvitedMemberDto) {
+		const user = await this.isCreatorOrMember(dto.teamId, userId)
+		if (user.creator) {
+			return await this.prisma.teamInvitation.delete({
+				where: {
+					id: dto.invitationId,
+					teamId: dto.teamId,
+					candidateId: dto.candidateId
+				}
+			})
+		}
+		if (user.member) {
+			const rights = await this.memberRights(
+				user.memberData.id,
+				user.memberData.teamId
+			)
+			if (rights.role.rights.includes(Rights.edit_member)) {
+				return await this.prisma.teamInvitation.delete({
+					where: {
+						id: dto.invitationId,
+						teamId: dto.teamId,
+						candidateId: dto.candidateId
 					}
 				})
 			} else throw new BadRequestException("You don't have enough rights")
@@ -229,6 +265,12 @@ export class TeamService {
 		if (invite.candidateId !== userId)
 			throw new BadRequestException('Incorrect data')
 
+		const roles = await this.prisma.teamRole.findMany({
+			where: {
+				teamId: invite.teamId
+			}
+		})
+
 		const newMember = await this.prisma.teamMember.create({
 			data: {
 				team: {
@@ -239,6 +281,11 @@ export class TeamService {
 				user: {
 					connect: {
 						id: invite.candidateId
+					}
+				},
+				role: {
+					connect: {
+						id: roles.find(item => item.name === 'Member').id
 					}
 				}
 			}
@@ -282,7 +329,16 @@ export class TeamService {
 				teamId
 			},
 			include: {
-				candidate: true
+				candidate: {
+					select: {
+						id: true,
+						nickname: true,
+						email: true,
+						firstName: true,
+						lastName: true,
+						avatarPath: true
+					}
+				}
 			}
 		})
 	}
@@ -314,21 +370,24 @@ export class TeamService {
 		})
 	}
 
-	async removeMember(teamId: string, dto: RemoveMemberDto) {
-		return await this.prisma.teamMember.delete({
-			where: {
-				id: dto.memberId,
-				teamId,
-				userId: dto.userId
-			}
-		})
+	async removeMember(teamId: string, dto: RemoveMemberDto, userId: string) {
+		if (await this.isCreatorOrMember(teamId, userId)) {
+			return await this.prisma.teamMember.delete({
+				where: {
+					id: dto.memberId,
+					teamId,
+					userId: dto.userId
+				}
+			})
+		}
 	}
 
-	async isCreatorOrMember(teamId: string, userId: string) {
+	async isCreatorOrMember(teamId: string, userId?: string, memberId?: string) {
 		const isMember = await this.prisma.teamMember.findFirst({
 			where: {
 				userId,
-				teamId
+				teamId,
+				id: memberId
 			}
 		})
 
@@ -370,11 +429,13 @@ export class TeamService {
 						include: {
 							role: {
 								select: {
+									id: true,
 									name: true
 								}
 							},
 							user: {
 								select: {
+									id: true,
 									firstName: true,
 									lastName: true,
 									nickname: true,
@@ -382,6 +443,16 @@ export class TeamService {
 									email: true
 								}
 							}
+						}
+					},
+					creator: {
+						select: {
+							id: true,
+							firstName: true,
+							lastName: true,
+							nickname: true,
+							avatarPath: true,
+							email: true
 						}
 					},
 					projects: {
@@ -411,23 +482,24 @@ export class TeamService {
 			where: {
 				userId
 			},
-			include: {
+			select: {
 				team: {
 					select: {
 						id: true,
 						name: true
 					}
-				},
-				role: {
-					select: {
-						name: true
-					}
 				}
 			}
 		})
+
+		const teams = member.map(item => ({
+			id: item.team.id,
+			name: item.team.name
+		}))
+
 		return {
 			createdByUser,
-			member
+			member: teams
 		}
 	}
 

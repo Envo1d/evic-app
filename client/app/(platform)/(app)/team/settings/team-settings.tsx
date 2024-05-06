@@ -23,8 +23,8 @@ export function TeamSettings() {
 	const [isMembersTab, setIsMembersTab] = useState(true)
 
 	return (
-		<section className="w-full h-3/4">
-			<Card className="border-none shadow-2xl h-3/4">
+		<section className={cn("w-full", isMembersTab ? "h-[80svh]" : "h-fit")}>
+			<Card className="border-none shadow-2xl h-full">
 				<ResizablePanelGroup
 					direction="horizontal"
 					className="w-full rounded-lg"

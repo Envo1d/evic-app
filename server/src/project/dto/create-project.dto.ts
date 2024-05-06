@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateProjectDto {
 	@IsString()
@@ -6,8 +6,8 @@ export class CreateProjectDto {
 	name: string
 
 	@IsString()
-	@IsOptional()
-	imagePath?: string
+	@IsNotEmpty()
+	teamMemberId: string
 
 	@IsString()
 	@IsNotEmpty()

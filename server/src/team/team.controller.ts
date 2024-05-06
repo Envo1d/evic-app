@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
-import { AddMemberDto } from './dto/add-member.dto'
+import { AddMemberDto, DeleteInvitedMemberDto } from './dto/add-member.dto'
 import { CreateTeamRoleDto } from './dto/create-team-role.dto'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { RemoveMemberDto } from './dto/remove-member.dto'
@@ -90,6 +90,17 @@ export class TeamController {
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
+	@Delete('delete-invite')
+	@Auth()
+	async deleteInvite(
+		@Body() dto: DeleteInvitedMemberDto,
+		@CurrentUser('id') userId: string
+	) {
+		return this.teamService.deleteInvitedMember(userId, dto)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
 	@Put('accept-invite/:id')
 	@Auth()
 	async acceptInvite(
@@ -101,7 +112,7 @@ export class TeamController {
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Put('decline-invite/:id')
+	@Delete('decline-invite/:id')
 	@Auth()
 	async declineInvite(
 		@Param('id') inviteId: string,
@@ -130,23 +141,25 @@ export class TeamController {
 	}
 
 	@HttpCode(200)
-	@Delete('remove-member/:team-id')
+	@Delete('remove-member/:id')
 	@Auth()
 	async removeMember(
-		@Param('team-id') teamId: string,
-		@Body() dto: RemoveMemberDto
+		@Param('id') teamId: string,
+		@Body() dto: RemoveMemberDto,
+		@CurrentUser('id') userId: string
 	) {
-		return this.teamService.removeMember(teamId, dto)
+		return this.teamService.removeMember(teamId, dto, userId)
 	}
 
 	@HttpCode(200)
-	@Delete('leave-team/:team-id')
+	@Delete('leave-team/:id')
 	@Auth()
 	async leaveTeam(
-		@Param('team-id') teamId: string,
-		@Body() dto: RemoveMemberDto
+		@Param('id') teamId: string,
+		@Body() dto: RemoveMemberDto,
+		@CurrentUser('id') userId: string
 	) {
-		return this.teamService.removeMember(teamId, dto)
+		return this.teamService.removeMember(teamId, dto, userId)
 	}
 
 	@Get('user-teams')

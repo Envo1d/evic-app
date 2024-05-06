@@ -81,6 +81,8 @@ export function SettingsTab() {
 		form.reset()
 	}, [isOpen, form.reset])
 
+	// TODO: add role creation
+
 	return (
 		<section className="flex flex-col gap-y-32">
 			<div>
@@ -132,6 +134,7 @@ export function SettingsTab() {
 										<Button
 											size="sm"
 											type="submit"
+											className="mt-5"
 										>
 											Save changes
 										</Button>

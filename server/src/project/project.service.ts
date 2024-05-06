@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { TeamService } from '../team/team.service'
 import { AddProjectMemberDto } from './dto/add-member.dto'
 import { CreateProjectDto } from './dto/create-project.dto'
 import { FindProjectDto } from './dto/find-project.dto'
+import { RemoveProjectMemberDto } from './dto/remove-member.dto'
 import { RemoveProjectDto } from './dto/remove-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 
@@ -15,22 +16,22 @@ export class ProjectService {
 	) {}
 
 	async create(dto: CreateProjectDto, userId: string) {
-		return await this.prisma.project.create({
-			data: {
-				name: dto.name,
-				imagePath: dto.imagePath,
-				team: {
-					connect: {
-						id: dto.teamId
-					}
-				},
-				owner: {
-					connect: {
-						id: userId
+		if (await this.teamService.isCreatorOrMember(dto.teamId, userId))
+			return await this.prisma.project.create({
+				data: {
+					name: dto.name,
+					team: {
+						connect: {
+							id: dto.teamId
+						}
+					},
+					owner: {
+						connect: {
+							id: dto.teamMemberId
+						}
 					}
 				}
-			}
-		})
+			})
 	}
 
 	async update(id: string, dto: UpdateProjectDto) {
@@ -40,8 +41,7 @@ export class ProjectService {
 				teamId: dto.teamId
 			},
 			data: {
-				name: dto.name,
-				imagePath: dto.imagePath
+				name: dto.name
 			}
 		})
 	}
@@ -55,21 +55,75 @@ export class ProjectService {
 		})
 	}
 
-	async addMember(dto: AddProjectMemberDto) {
-		return await this.prisma.projectMember.create({
-			data: {
-				project: {
-					connect: {
-						id: dto.projectId
+	async addMember(dto: AddProjectMemberDto, userId: string) {
+		if (await this.teamService.isCreatorOrMember(dto.teamId, userId))
+			if (
+				await this.teamService.isCreatorOrMember(
+					dto.teamId,
+					undefined,
+					dto.teamMemberId
+				)
+			)
+				return await this.prisma.projectMember.create({
+					data: {
+						project: {
+							connect: {
+								id: dto.projectId
+							}
+						},
+						teamMember: {
+							connect: {
+								id: dto.teamMemberId
+							}
+						}
 					}
-				},
-				teamMember: {
-					connect: {
-						id: dto.teamMemberId
-					}
-				}
+				})
+	}
+
+	async isCreatorOrMember(
+		teamMemberId: string,
+		projectId: string,
+		memberId: string
+	) {
+		const isMember = await this.prisma.projectMember.findFirst({
+			where: {
+				teamMemberId,
+				projectId,
+				id: memberId
 			}
 		})
+
+		const isCreator = await this.prisma.project.findFirst({
+			where: {
+				ownerId: teamMemberId
+			},
+			select: {
+				ownerId: true
+			}
+		})
+
+		if (isCreator) return { creator: true }
+		if (isMember) return { member: true, memberData: isMember }
+
+		throw new BadRequestException('User is not member of this project')
+	}
+
+	async deleteMember(dto: RemoveProjectMemberDto, userId: string) {
+		if (await this.teamService.isCreatorOrMember(dto.teamId, userId))
+			if (
+				await this.isCreatorOrMember(
+					dto.teamMemberId,
+					dto.projectId,
+					dto.projectMemberId
+				)
+			)
+				return await this.prisma.projectMember.delete({
+					where: {
+						id: dto.projectMemberId,
+						projectId: dto.projectId,
+						teamMemberId: dto.teamMemberId
+					}
+				})
 	}
 
 	async getAllByTeamId(dto: FindProjectDto, userId: string) {
@@ -117,24 +171,40 @@ export class ProjectService {
 						include: {
 							comments: {
 								include: {
-									user: {
+									teamMember: {
 										select: {
-											email: true,
-											nickname: true,
-											firstName: true,
-											lastName: true,
-											avatarPath: true
+											user: {
+												select: {
+													email: true,
+													nickname: true,
+													firstName: true,
+													lastName: true,
+													avatarPath: true
+												}
+											}
 										}
 									}
 								}
 							},
 							taskExecutor: {
-								select: {
-									email: true,
-									nickname: true,
-									firstName: true,
-									lastName: true,
-									avatarPath: true
+								include: {
+									projectMember: {
+										include: {
+											teamMember: {
+												select: {
+													user: {
+														select: {
+															email: true,
+															nickname: true,
+															firstName: true,
+															lastName: true,
+															avatarPath: true
+														}
+													}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
