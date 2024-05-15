@@ -2,21 +2,27 @@
 
 import { Plus } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 import { Accordion } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import { useAppStore } from "@/providers/store-provider"
-
-import { useTeam, useTeamList } from "@/hooks/teams"
+import { useGetActiveTeam, useTeam, useTeamList } from "@/hooks/teams"
 
 import { NavItem } from "./nav-item"
 
 export function Sidebar() {
-	const { activeTeamId } = useAppStore(state => state)
+	const { data: activeTeam } = useGetActiveTeam()
 	const { isLoading: isLoadingTeam } = useTeam()
 	const { data: teamList, isLoading: isLoadingTeamList } = useTeamList()
+	const [value, setValue] = useState<string[]>([activeTeam?.activeTeamId!])
+
+	useEffect(() => {
+		if (activeTeam?.activeTeamId) {
+			setValue([activeTeam?.activeTeamId!])
+		}
+	}, [activeTeam?.activeTeamId])
 
 	if (isLoadingTeam || isLoadingTeamList) {
 		return (
@@ -53,19 +59,14 @@ export function Sidebar() {
 			<Accordion
 				type="multiple"
 				className="space-y-2"
-				defaultValue={[activeTeamId]}
+				defaultValue={value}
+				onValueChange={setValue}
+				value={value}
 			>
-				{teamList?.createdByUser.map(team => (
-					<NavItem
-						key={team.id}
-						isActive={activeTeamId === team.id}
-						team={team}
-					/>
-				))}
 				{teamList?.member.map(team => (
 					<NavItem
 						key={team.id}
-						isActive={activeTeamId === team.id}
+						isActive={activeTeam?.activeTeamId === team.id}
 						team={team}
 					/>
 				))}

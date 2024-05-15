@@ -1,7 +1,7 @@
 "use client"
 
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import { valibotResolver } from "@hookform/resolvers/valibot"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -28,16 +28,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-import { useAppStore } from "@/providers/store-provider"
-
 import { ITeamCreateForm, ITeamCreateRoleForm } from "@/types/team.types"
 
+import { useSetActiveTeam } from "@/hooks/teams"
 import { useTeamList } from "@/hooks/teams/useTeamList"
 
 import api from "@/api"
 
 export function TeamSelection() {
-	const { setActiveTeamId } = useAppStore(state => state)
+	const { setActiveTeam } = useSetActiveTeam()
 
 	const { data: teams } = useTeamList()
 
@@ -45,7 +44,7 @@ export function TeamSelection() {
 
 	const form = useForm<ITeamCreateRoleForm>({
 		mode: "onChange",
-		resolver: valibotResolver(api.team.createTeamValidationSchema),
+		resolver: zodResolver(api.team.createTeamValidationSchema),
 		defaultValues: {
 			name: ""
 		}
@@ -58,7 +57,7 @@ export function TeamSelection() {
 		mutationFn: (data: ITeamCreateForm) => api.team.createTeam(data),
 		onSuccess(res) {
 			toast.success(`Team "${res.name}" created!`)
-			setActiveTeamId(res.id)
+			setActiveTeam(res.id)
 			push("/team")
 		}
 	})
@@ -82,16 +81,8 @@ export function TeamSelection() {
 			</CardHeader>
 			<CardContent>
 				{isTeamSelection ? (
-					teams &&
-					(teams?.createdByUser.length > 0 || teams?.member.length > 0) ? (
+					teams && teams?.member.length > 0 ? (
 						<ScrollArea className="flex flex-col gap-2 h-56 w-full p-5 rounded-md border">
-							{teams.createdByUser.map(team => (
-								<TeamCard
-									key={team.id}
-									name={team.name}
-									id={team.id}
-								/>
-							))}
 							{teams.member.map(team => (
 								<TeamCard
 									key={team.id}

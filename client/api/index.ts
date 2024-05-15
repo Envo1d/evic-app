@@ -6,7 +6,6 @@ import AuthModule from "@/repository/modules/auth.module"
 import ProjectModule from "@/repository/modules/project.module"
 import TaskModule from "@/repository/modules/task.module"
 import TeamModule from "@/repository/modules/team.module"
-import TimeBlockModule from "@/repository/modules/time-block.module"
 import TimerModule from "@/repository/modules/timer.module"
 import TokenModule from "@/repository/modules/token.module"
 import UserModule from "@/repository/modules/user.module"
@@ -14,8 +13,7 @@ import UserModule from "@/repository/modules/user.module"
 const tokenModule = new TokenModule()
 
 const fetchOptions: FetchOptions = {
-	// TODO: to env
-	baseURL: "http://localhost:7000/api",
+	baseURL: process.env.NEXT_PUBLIC_API_URL,
 	credentials: "include",
 	async onRequest({ options }) {
 		const accessToken = tokenModule.getAccessToken()
@@ -29,8 +27,7 @@ const fetchOptions: FetchOptions = {
 	async onResponse({ response }) {
 		if (response.status === 401) {
 			const res = await ofetch("/auth/refresh-tokens", {
-				// TODO: to env
-				baseURL: "http://localhost:7000/api",
+				baseURL: process.env.NEXT_PUBLIC_API_URL,
 				method: "POST",
 				credentials: "include"
 			})
@@ -51,7 +48,6 @@ const api: IApiInstance = {
 	auth: new AuthModule(apiFetcher),
 	user: new UserModule(apiFetcher),
 	timer: new TimerModule(apiFetcher),
-	timeBlock: new TimeBlockModule(apiFetcher),
 	task: new TaskModule(apiFetcher),
 	team: new TeamModule(apiFetcher),
 	project: new ProjectModule(apiFetcher)

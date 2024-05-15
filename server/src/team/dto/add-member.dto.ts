@@ -4,10 +4,6 @@ export class AddMemberDto {
 	@IsString()
 	@IsNotEmpty()
 	candidateEmail: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 }
 
 export class DeleteInvitedMemberDto {
@@ -18,8 +14,4 @@ export class DeleteInvitedMemberDto {
 	@IsString()
 	@IsNotEmpty()
 	candidateId: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 }

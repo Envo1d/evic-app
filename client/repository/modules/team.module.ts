@@ -1,6 +1,7 @@
-import { minLength, object, string } from "valibot"
+import { z } from "zod"
 
 import {
+	IActiveTeamMemberResponse,
 	ITeamAddMemberForm,
 	ITeamCreateForm,
 	ITeamCreateRoleForm,
@@ -10,7 +11,6 @@ import {
 	ITeamRemoveMemberForm,
 	ITeamResponse,
 	ITeamRoleResponse,
-	ITeamSetMemberRoleForm,
 	ITeamUpdateMemberRoleForm,
 	IUserTeams
 } from "@/types/team.types"
@@ -20,8 +20,8 @@ import HttpFactory from "../factory"
 class TeamModule extends HttpFactory {
 	private URL = "/team"
 
-	createTeamValidationSchema = object({
-		name: string("", [minLength(3, "Name is too short")])
+	createTeamValidationSchema = z.object({
+		name: z.string().min(3, { message: "Name is too short" })
 	})
 
 	async createTeam(data: ITeamCreateForm): Promise<ITeamResponse> {
@@ -44,23 +44,8 @@ class TeamModule extends HttpFactory {
 		return res
 	}
 
-	async getTeamRoles(id: string): Promise<ITeamRoleResponse[]> {
-		const res = await this.call<ITeamRoleResponse[]>(
-			"GET",
-			`${this.URL}/team-roles/${id}`
-		)
-
-		return res
-	}
-
-	async setMemberRole(
-		data: ITeamSetMemberRoleForm
-	): Promise<ITeamMemberResponse> {
-		const res = await this.call<ITeamMemberResponse>(
-			"POST",
-			`${this.URL}/set-role`,
-			data
-		)
+	async getTeamRoles(): Promise<ITeamRoleResponse[]> {
+		const res = await this.call<ITeamRoleResponse[]>("GET", `${this.URL}/roles`)
 
 		return res
 	}
@@ -69,7 +54,7 @@ class TeamModule extends HttpFactory {
 		data: ITeamUpdateMemberRoleForm
 	): Promise<ITeamMemberResponse> {
 		const res = await this.call<ITeamMemberResponse>(
-			"POST",
+			"PATCH",
 			`${this.URL}/update-role`,
 			data
 		)
@@ -107,7 +92,7 @@ class TeamModule extends HttpFactory {
 
 	async deleteInvite(data: ITeamDeleteInviteForm): Promise<boolean> {
 		const res = await this.call<boolean>(
-			"DELETE",
+			"PUT",
 			`${this.URL}/delete-invite`,
 			data
 		)
@@ -115,10 +100,10 @@ class TeamModule extends HttpFactory {
 		return res
 	}
 
-	async getTeamInvitations(id: string): Promise<ITeamInviteResponse[]> {
+	async getTeamInvitations(): Promise<ITeamInviteResponse[]> {
 		const res = await this.call<ITeamInviteResponse[]>(
 			"GET",
-			`${this.URL}/invitations/${id}`
+			`${this.URL}/invitations`
 		)
 
 		return res
@@ -133,22 +118,14 @@ class TeamModule extends HttpFactory {
 		return res
 	}
 
-	async removeMember(teamId: string, data: ITeamRemoveMemberForm) {
-		const res = await this.call(
-			"DELETE",
-			`${this.URL}/remove-member/${teamId}`,
-			data
-		)
+	async removeMember(data: ITeamRemoveMemberForm) {
+		const res = await this.call("PUT", `${this.URL}/remove-member`, data)
 
 		return res
 	}
 
-	async leaveTeam(teamId: string, data: ITeamRemoveMemberForm) {
-		const res = await this.call(
-			"DELETE",
-			`${this.URL}/leave-team/${teamId}`,
-			data
-		)
+	async leaveTeam(data: ITeamRemoveMemberForm) {
+		const res = await this.call("PUT", `${this.URL}/leave-team`, data)
 
 		return res
 	}
@@ -159,20 +136,57 @@ class TeamModule extends HttpFactory {
 		return res
 	}
 
-	async getTeamDetails(id: string): Promise<ITeamResponse> {
-		const res = await this.call<ITeamResponse>("GET", `${this.URL}/${id}`)
+	async getTeamDetails(): Promise<ITeamResponse> {
+		const res = await this.call<ITeamResponse>("GET", `${this.URL}`)
 
 		return res
 	}
 
-	async updateTeam(id: string, data: ITeamCreateForm): Promise<ITeamResponse> {
-		const res = await this.call<ITeamResponse>("PUT", `${this.URL}/${id}`, data)
+	async updateTeam(data: ITeamCreateForm): Promise<ITeamResponse> {
+		const res = await this.call<ITeamResponse>("PUT", `${this.URL}`, data)
 
 		return res
 	}
 
-	async deleteTeam(id: string) {
-		const res = await this.call("DELETE", `${this.URL}/${id}`)
+	async deleteTeam() {
+		const res = await this.call("DELETE", `${this.URL}`)
+
+		return res
+	}
+
+	async setActiveTeam(id: string): Promise<IActiveTeamMemberResponse> {
+		const res = await this.call<IActiveTeamMemberResponse>(
+			"PUT",
+			`${this.URL}/set-active-team/${id}`
+		)
+
+		return res
+	}
+
+	async getActiveTeam(): Promise<IActiveTeamMemberResponse> {
+		const res = await this.call<IActiveTeamMemberResponse>(
+			"GET",
+			`${this.URL}/get-active-team`
+		)
+
+		return res
+	}
+
+	async deleteTeamRole(id: string) {
+		const res = await this.call("DELETE", `${this.URL}/delete-role/${id}`)
+
+		return res
+	}
+
+	async updateTeamRole(
+		id: string,
+		data: ITeamCreateRoleForm
+	): Promise<ITeamRoleResponse> {
+		const res = await this.call<ITeamRoleResponse>(
+			"PATCH",
+			`${this.URL}/update-role/${id}`,
+			data
+		)
 
 		return res
 	}

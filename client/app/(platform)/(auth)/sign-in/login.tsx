@@ -1,7 +1,7 @@
 "use client"
 
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import { valibotResolver } from "@hookform/resolvers/valibot"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -27,7 +27,7 @@ import api from "@/api"
 export function Login() {
 	const form = useForm<IAuthForm>({
 		mode: "onChange",
-		resolver: valibotResolver(api.auth.validationSchema),
+		resolver: zodResolver(api.auth.validationSchema),
 		defaultValues: {
 			email: "",
 			password: ""

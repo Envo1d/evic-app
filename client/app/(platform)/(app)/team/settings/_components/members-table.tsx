@@ -13,12 +13,7 @@ import {
 	getSortedRowModel,
 	useReactTable
 } from "@tanstack/react-table"
-import {
-	ArrowUpDown,
-	ChevronDown,
-	MoreHorizontal,
-	RefreshCw
-} from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -68,8 +63,7 @@ export function MembersTable() {
 
 	const { mutate: deleteMember } = useMutation({
 		mutationKey: ["delete team member"],
-		mutationFn: (data: ITeamRemoveMemberForm) =>
-			api.team.removeMember(teamData?.id as string, data),
+		mutationFn: (data: ITeamRemoveMemberForm) => api.team.removeMember(data),
 		onSuccess() {
 			refetch()
 		}
@@ -108,15 +102,19 @@ export function MembersTable() {
 									data?.email.charAt(0)}
 							</AvatarFallback>
 						</Avatar>
-						<div className="flex flex-row items-center gap-x-1">
-							<p className="font-semibold text-base">
-								{data?.nickname ||
-									(data.firstName && `${data?.firstName} ${data?.lastName}`) ||
-									data?.email}
-							</p>
+						<div className="flex flex-row items-center gap-x-3 w-full">
+							<div className="flex flex-col gap-y-px">
+								{data.email && data.lastName && (
+									<p className="font-semibold text-base">
+										{data?.firstName} {data?.lastName}
+									</p>
+								)}
+								<p className="font-light text-sm">{data?.email}</p>
+								{data.nickname && <p className="">{data?.nickname}</p>}
+							</div>
 							{profile && data.id === profile.id && (
 								<Badge
-									className="cursor-default w-1/3 h-1/3 pointer-events-none"
+									className="cursor-default w-11 h-1/3 pointer-events-none"
 									variant="primary"
 								>
 									you
@@ -179,8 +177,7 @@ export function MembersTable() {
 								<DropdownMenuItem
 									onClick={() =>
 										deleteMember({
-											userId: data.id,
-											memberId: data.memberId as string
+											memberId: data.memberId!
 										})
 									}
 								>
@@ -213,43 +210,26 @@ export function MembersTable() {
 	})
 
 	useEffect(() => {
-		if (teamData !== undefined)
-			if (teamData.creator !== undefined) {
-				const creator = {
-					user: {
-						id: teamData.creatorId,
-						email: teamData.creator.email,
-						nickname: teamData.creator.nickname,
-						firstName: teamData.creator.firstName,
-						lastName: teamData.creator.lastName,
-						avatarPath: teamData.creator.avatarPath,
-						memberId: "0"
-					},
-					joined: teamData.createdAt,
-					role: {
-						id: "1",
-						name: "Creator"
-					}
+		refetch()
+		if (teamData !== undefined) {
+			const members = teamData?.members?.map(member => ({
+				user: {
+					id: member.user.id,
+					email: member.user.email,
+					nickname: member.user.nickname,
+					firstName: member.user.firstName,
+					lastName: member.user.lastName,
+					avatarPath: member.user.avatarPath,
+					memberId: member.id
+				},
+				joined: member.createdAt,
+				role: {
+					id: member.role.id,
+					name: member.role.name
 				}
-				const members = teamData?.members?.map(member => ({
-					user: {
-						id: member.user.id,
-						email: member.user.email,
-						nickname: member.user.nickname,
-						firstName: member.user.firstName,
-						lastName: member.user.lastName,
-						avatarPath: member.user.avatarPath,
-						memberId: member.id
-					},
-					joined: member.createdAt,
-					role: {
-						id: member.role.id,
-						name: member.role.name
-					}
-				}))
-				if (members) setData([creator, ...members])
-				else setData([creator])
-			}
+			}))
+			if (members) setData([...members])
+		}
 	}, [teamData])
 
 	return (
@@ -263,14 +243,6 @@ export function MembersTable() {
 					}
 					className="max-w-sm"
 				/>
-				<Button
-					size="sm"
-					variant="ghost"
-					className="ml-5 active:-translate-y-1 transition-transform"
-					onClick={() => refetch()}
-				>
-					<RefreshCw className="hover:rotate-90 transition-transform " />
-				</Button>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button

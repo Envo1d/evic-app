@@ -1,11 +1,10 @@
 "use client"
 
-import { useQueryClient } from "@tanstack/react-query"
 import { Building, ChevronsUpDown } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { useAppStore } from "@/providers/store-provider"
-
+import { useGetActiveTeam, useSetActiveTeam } from "@/hooks/teams"
 import { useTeamList } from "@/hooks/teams/useTeamList"
 
 import { Button } from "./ui/button"
@@ -18,32 +17,32 @@ import {
 	CommandList
 } from "./ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import api from "@/api"
+import { Skeleton } from "./ui/skeleton"
 import { cn } from "@/lib/utils"
 
 export function TeamSelector() {
 	const { data: teams, isLoading } = useTeamList()
+	const { push } = useRouter()
 
-	const { activeTeamId, setActiveTeamId } = useAppStore(state => state)
-
-	const queryClient = useQueryClient()
+	const { setActiveTeam } = useSetActiveTeam()
+	const { data, isLoading: isActiveTeamLoading } = useGetActiveTeam()
 
 	const [open, setOpen] = useState(false)
-	const [value, setValue] = useState(activeTeamId)
+	const [value, setValue] = useState(data?.activeTeamId!)
 
 	useEffect(() => {
-		if (activeTeamId !== "0") {
-			setValue(activeTeamId)
+		if (value !== undefined) {
+			setActiveTeam(value)
+			setOpen(false)
 		}
-	}, [activeTeamId])
+	}, [value])
 
-	const changeTeam = async (value: string) => {
-		setActiveTeamId(value)
-		await queryClient.fetchQuery({
-			queryKey: ["team"],
-			queryFn: () => api.team.getTeamDetails(value)
-		})
-		setOpen(false)
+	useEffect(() => {
+		if (data !== undefined) setValue(data.activeTeamId)
+	}, [data])
+
+	if (isActiveTeamLoading) {
+		return <Skeleton className="w-[200px] h-1/3" />
 	}
 
 	return (
@@ -65,8 +64,7 @@ export function TeamSelector() {
 								size={35}
 							/>
 							<p className="font-semibold truncate">
-								{teams?.createdByUser.find(team => team.id === value)?.name ||
-									teams?.member.find(team => team.id === value)?.name}
+								{teams?.member.find(team => team.id === value)?.name}
 							</p>
 						</div>
 					) : (
@@ -82,34 +80,12 @@ export function TeamSelector() {
 						<CommandEmpty>No teams found.</CommandEmpty>
 						<CommandGroup>
 							<CommandList>
-								{teams?.createdByUser.map(team => (
-									<CommandItem
-										key={team.id}
-										value={team.id}
-										onSelect={currentValue => changeTeam(currentValue)}
-									>
-										<div
-											className={cn(
-												"p-2 rounded-lg shadow-md hover:translate-x-1  transition-all flex flex-row gap-1  items-center hover:shadow-xl w-full cursor-pointer",
-												value === team.id
-													? "bg-slate-200 hover:bg-slate-300 border"
-													: ""
-											)}
-										>
-											<Building
-												className="bg-gradient-to-tr from-violet-500 to-blue-500 w-11 h-11 rounded-md p-1 text-white"
-												size={35}
-											/>
-											<p className="font-semibold truncate">{team.name}</p>
-										</div>
-									</CommandItem>
-								))}
 								{teams?.member.map(team => (
 									<CommandItem
 										key={team.id}
 										value={team.id}
 										onSelect={currentValue => {
-											setValue(currentValue === value ? "" : currentValue)
+											setValue(currentValue)
 											setOpen(false)
 										}}
 									>

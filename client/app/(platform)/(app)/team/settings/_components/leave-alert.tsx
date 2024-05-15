@@ -17,18 +17,13 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-import { useAppStore } from "@/providers/store-provider"
-
-import { useTeam } from "@/hooks/teams"
-import { useProfile } from "@/hooks/useProfile"
+import { useGetActiveTeam } from "@/hooks/teams"
 
 import api from "@/api"
 
 export function LeaveAlert() {
 	const { push } = useRouter()
-	const { activeTeamId } = useAppStore(state => state)
-	const { data: profile } = useProfile()
-	const { data: team } = useTeam()
+	const { data } = useGetActiveTeam()
 
 	const submit = () => {
 		mutate()
@@ -37,10 +32,8 @@ export function LeaveAlert() {
 	const { mutate } = useMutation({
 		mutationKey: ["leave team"],
 		mutationFn: () =>
-			api.team.leaveTeam(activeTeamId, {
-				userId: profile?.id as string,
-				memberId: team?.members?.find(member => member.id === profile?.id)
-					?.id as string
+			api.team.leaveTeam({
+				memberId: data?.activeTeamMemberId!
 			}),
 		onSuccess() {
 			push("/team-selection")

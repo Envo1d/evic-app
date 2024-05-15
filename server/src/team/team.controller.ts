@@ -5,101 +5,162 @@ import {
 	Get,
 	HttpCode,
 	Param,
+	Patch,
 	Post,
 	Put,
+	Res,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { Rights } from '@prisma/client'
+import { Response } from 'express'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
+import { AppConfig } from '../config/configuration.interface'
+import { AuthTeamMember } from './decorators/auth-team-member.decorator'
+import { CurrentTeam } from './decorators/team.decorator'
 import { AddMemberDto, DeleteInvitedMemberDto } from './dto/add-member.dto'
-import { CreateTeamRoleDto } from './dto/create-team-role.dto'
+import {
+	CreateTeamRoleDto,
+	UpdateTeamRoleDto
+} from './dto/create-team-role.dto'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { RemoveMemberDto } from './dto/remove-member.dto'
-import {
-	SetMemberRoleDto,
-	UpdateMemberRoleDto
-} from './dto/update-member-role.dto'
+import { UpdateMemberRoleDto } from './dto/update-member-role.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
 import { TeamService } from './team.service'
 
 @Controller('team')
 export class TeamController {
-	constructor(private readonly teamService: TeamService) {}
+	constructor(
+		private readonly teamService: TeamService,
+		private readonly config: ConfigService
+	) {}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('create')
 	@Auth()
-	async create(@Body() dto: CreateTeamDto, @CurrentUser('id') userId: string) {
-		return this.teamService.create(dto, userId)
+	async create(
+		@Body() dto: CreateTeamDto,
+		@CurrentUser('id') userId: string,
+		@Res({ passthrough: true }) res: Response
+	) {
+		const data = await this.teamService.create(dto, userId)
+		res.cookie('team_id', data.id, {
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24 * 365,
+			domain: this.config.get<AppConfig>('app').domain,
+			secure: this.config.get<AppConfig>('app').secure,
+			sameSite: this.config.get<AppConfig>('app').cookie_same_site
+		})
+		return data
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('create-role')
-	@Auth()
+	@AuthTeamMember([Rights.create_role])
 	async createRole(
 		@Body() dto: CreateTeamRoleDto,
-		@CurrentUser('id') userId: string
+		@CurrentTeam() teamId: string
 	) {
-		return this.teamService.createRole(dto, userId)
+		return this.teamService.createRole(dto, teamId)
 	}
 
-	@Get('team-roles/:id')
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Patch('update-role/:id')
+	@AuthTeamMember([Rights.edit_role])
+	async updateRole(
+		@Body() dto: UpdateTeamRoleDto,
+		@CurrentTeam() teamId: string,
+		@Param('id') roleId: string
+	) {
+		return this.teamService.updateRole(dto, teamId, roleId)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Delete('delete-role/:id')
+	@AuthTeamMember([Rights.delete_role])
+	async deleteRole(@CurrentTeam() teamId: string, @Param('id') roleId: string) {
+		return this.teamService.deleteRole(roleId, teamId)
+	}
+
+	@HttpCode(200)
+	@Put('/set-active-team/:id')
 	@Auth()
-	async getTeamRoles(
+	async setActiveTeam(
+		@Param('id') teamId: string,
 		@CurrentUser('id') userId: string,
-		@Param('id') teamId: string
+		@Res({ passthrough: true }) res: Response
 	) {
-		return this.teamService.getTeamRoles(teamId, userId)
+		const data = await this.teamService.updateActiveTeamMember(teamId, userId)
+		res.cookie('team_id', data.activeTeamId, {
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24 * 365,
+			domain: this.config.get<AppConfig>('app').domain,
+			secure: this.config.get<AppConfig>('app').secure,
+			sameSite: this.config.get<AppConfig>('app').cookie_same_site
+		})
+		return data
+	}
+
+	@Get('/get-active-team')
+	@Auth()
+	async getActiveTeam(
+		@CurrentUser('id') userId: string,
+		@Res({ passthrough: true }) res: Response
+	) {
+		const data = await this.teamService.getActiveTeamMember(userId)
+		res.cookie('team_id', data.activeTeamId, {
+			httpOnly: true,
+			maxAge: 1000 * 60 * 60 * 24 * 365,
+			domain: this.config.get<AppConfig>('app').domain,
+			secure: this.config.get<AppConfig>('app').secure,
+			sameSite: this.config.get<AppConfig>('app').cookie_same_site
+		})
+		return data
+	}
+
+	@Get('roles')
+	@AuthTeamMember()
+	async getTeamRoles(@CurrentTeam() teamId: string) {
+		return this.teamService.getTeamRoles(teamId)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Post('set-role')
-	@Auth()
-	async setMemberRole(
-		@Body() dto: SetMemberRoleDto,
-		@CurrentUser('id') userId: string
-	) {
-		return this.teamService.setMemberRole(dto, userId)
-	}
-
-	@UsePipes(new ValidationPipe())
-	@HttpCode(200)
-	@Post('update-role')
-	@Auth()
+	@Patch('update-member-role')
+	@AuthTeamMember([Rights.set_member_role])
 	async updateMemberRole(
 		@Body() dto: UpdateMemberRoleDto,
-		@CurrentUser('id') userId: string
+		@CurrentTeam() teamId: string
 	) {
-		return this.teamService.updateMemberRole(dto, userId)
+		return this.teamService.updateMemberRole(dto, teamId)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('invite-member')
-	@Auth()
-	async inviteMember(
-		@Body() dto: AddMemberDto,
-		@CurrentUser('id') userId: string
-	) {
-		return this.teamService.inviteMember(userId, dto)
+	@AuthTeamMember([Rights.invite_member])
+	async inviteMember(@Body() dto: AddMemberDto, @CurrentTeam() teamId: string) {
+		return this.teamService.inviteMember(dto, teamId)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Delete('delete-invite')
-	@Auth()
+	@Put('delete-invite')
+	@AuthTeamMember([Rights.delete_member])
 	async deleteInvite(
 		@Body() dto: DeleteInvitedMemberDto,
-		@CurrentUser('id') userId: string
+		@CurrentTeam() teamId: string
 	) {
-		return this.teamService.deleteInvitedMember(userId, dto)
+		return this.teamService.deleteInvitedMember(dto, teamId)
 	}
 
-	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Put('accept-invite/:id')
 	@Auth()
@@ -110,7 +171,6 @@ export class TeamController {
 		return this.teamService.acceptInvite(inviteId, userId)
 	}
 
-	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Delete('decline-invite/:id')
 	@Auth()
@@ -121,18 +181,13 @@ export class TeamController {
 		return this.teamService.declineInvite(inviteId, userId)
 	}
 
-	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Get('invitations/:teamId')
-	@Auth()
-	async getTeamInvitations(
-		@CurrentUser('id') userId: string,
-		@Param('teamId') teamId: string
-	) {
-		return this.teamService.getTeamInvitations(teamId, userId)
+	@Get('invitations')
+	@AuthTeamMember()
+	async getTeamInvitations(@CurrentTeam() teamId: string) {
+		return this.teamService.getTeamInvitations(teamId)
 	}
 
-	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Get('user-invitations')
 	@Auth()
@@ -140,26 +195,23 @@ export class TeamController {
 		return this.teamService.getUserInvitations(userId)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Delete('remove-member/:id')
-	@Auth()
+	@Put('remove-member')
+	@AuthTeamMember([Rights.delete_member])
 	async removeMember(
-		@Param('id') teamId: string,
-		@Body() dto: RemoveMemberDto,
-		@CurrentUser('id') userId: string
+		@CurrentTeam() teamId: string,
+		@Body() dto: RemoveMemberDto
 	) {
-		return this.teamService.removeMember(teamId, dto, userId)
+		return this.teamService.removeMember(teamId, dto)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Delete('leave-team/:id')
-	@Auth()
-	async leaveTeam(
-		@Param('id') teamId: string,
-		@Body() dto: RemoveMemberDto,
-		@CurrentUser('id') userId: string
-	) {
-		return this.teamService.removeMember(teamId, dto, userId)
+	@Put('leave-team')
+	@AuthTeamMember()
+	async leaveTeam(@CurrentTeam() teamId: string, @Body() dto: RemoveMemberDto) {
+		return this.teamService.removeMember(teamId, dto)
 	}
 
 	@Get('user-teams')
@@ -168,28 +220,24 @@ export class TeamController {
 		return this.teamService.findAllUserTeams(userId)
 	}
 
-	@Get(':id')
-	@Auth()
-	async getTeam(@CurrentUser('id') userId: string, @Param('id') id: string) {
-		return this.teamService.getTeamDetails(id, userId)
+	@Get()
+	@AuthTeamMember()
+	async getTeam(@CurrentTeam() teamId: string) {
+		return this.teamService.getTeamDetails(teamId)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Put(':id')
-	@Auth()
-	async update(
-		@Body() dto: UpdateTeamDto,
-		@CurrentUser('id') userId: string,
-		@Param('id') id: string
-	) {
-		return this.teamService.updateTeamName(id, dto)
+	@Put()
+	@AuthTeamMember([Rights.edit_team])
+	async update(@Body() dto: UpdateTeamDto, @CurrentTeam() teamId: string) {
+		return this.teamService.updateTeamName(teamId, dto)
 	}
 
 	@HttpCode(200)
-	@Delete(':id')
-	@Auth()
-	async remove(@Param('id') id: string) {
-		return this.teamService.removeTeam(id)
+	@Delete()
+	@AuthTeamMember([Rights.delete_team])
+	async remove(@CurrentTeam() teamId: string) {
+		return this.teamService.removeTeam(teamId)
 	}
 }

@@ -1,6 +1,7 @@
+import { z } from "zod"
+
 import {
 	IDeleteProjectForm,
-	IFindProjectForm,
 	IProjectAddMemberForm,
 	IProjectCreateForm,
 	IProjectMemberResponse,
@@ -13,6 +14,13 @@ import HttpFactory from "../factory"
 
 class ProjectModule extends HttpFactory {
 	private URL = "/project"
+
+	createValidationSchema = z.object({
+		name: z
+			.string()
+			.min(3, { message: "Minimum length of 3 letters is required" }),
+		imagePath: z.string().min(1, { message: "Image not selected" })
+	})
 
 	async create(data: IProjectCreateForm): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>("POST", `${this.URL}`, data)
@@ -32,21 +40,19 @@ class ProjectModule extends HttpFactory {
 		return res
 	}
 
-	async getAllProjects(data: IFindProjectForm): Promise<IProjectResponse[]> {
+	async getAllProjects(teamId: string): Promise<IProjectResponse[]> {
 		const res = await this.call<IProjectResponse[]>(
 			"GET",
-			`${this.URL}/by-team`,
-			data
+			`${this.URL}/by-team/${teamId}`
 		)
 
 		return res
 	}
 
-	async getProjectDetails(data: IFindProjectForm): Promise<IProjectResponse> {
+	async getProjectDetails(id: string): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>(
 			"GET",
-			`${this.URL}/details`,
-			data
+			`${this.URL}/details/${id}`
 		)
 
 		return res
@@ -70,8 +76,8 @@ class ProjectModule extends HttpFactory {
 		data: IDeleteProjectForm
 	): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>(
-			"DELETE",
-			`${this.URL}/${id}`,
+			"PUT",
+			`${this.URL}/delete/${id}`,
 			data
 		)
 
@@ -82,7 +88,7 @@ class ProjectModule extends HttpFactory {
 		data: IProjectRemoveMemberForm
 	): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>(
-			"DELETE",
+			"PUT",
 			`${this.URL}/delete-member`,
 			data
 		)

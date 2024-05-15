@@ -7,8 +7,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 
-import { useAppStore } from "@/providers/store-provider"
-
+import { useGetActiveTeam } from "@/hooks/teams"
 import { useMobileSidebar } from "@/hooks/useMobileSidebar"
 
 import { Sidebar } from "./sidebar"
@@ -19,7 +18,7 @@ export function MobileSidebar() {
 	const isOpen = useMobileSidebar(state => state.isOpen)
 
 	const pathname = usePathname()
-	const { activeTeamId } = useAppStore(state => state)
+	const { data } = useGetActiveTeam()
 
 	const [isMounted, setIsMounted] = useState(false)
 
@@ -29,7 +28,7 @@ export function MobileSidebar() {
 
 	useEffect(() => {
 		onClose()
-	}, [pathname, activeTeamId, onClose])
+	}, [pathname, data?.activeTeamId, onClose])
 
 	if (!isMounted) return null
 
