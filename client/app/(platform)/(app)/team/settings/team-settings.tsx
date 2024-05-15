@@ -1,6 +1,6 @@
 "use client"
 
-import { Building, Settings, User } from "lucide-react"
+import { Settings, User, UsersRound } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,7 @@ import { SettingsTab } from "./_components/settings-tab"
 import { cn } from "@/lib/utils"
 
 export function TeamSettings() {
-	const { data, isLoading } = useTeam()
+	const { data } = useTeam()
 
 	const [isMembersTab, setIsMembersTab] = useState(true)
 
@@ -36,7 +36,7 @@ export function TeamSettings() {
 					>
 						<div className="flex flex-col pt-6 px-8 ">
 							<div className="flex flex-row gap-1 items-center w-full mb-5">
-								<Building
+								<UsersRound
 									className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 border text-white"
 									size={35}
 								/>
@@ -66,7 +66,7 @@ export function TeamSettings() {
 					</ResizablePanel>
 					<ResizableHandle />
 					<ResizablePanel defaultSize={70}>
-						<div className="flex flex-col h-[500px] py-11 px-8">
+						<div className="flex flex-col h-full py-11 px-8">
 							<h1 className="font-semibold text-5xl mb-2">
 								{isMembersTab ? "Members" : "Settings"}
 							</h1>

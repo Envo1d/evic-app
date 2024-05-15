@@ -1,6 +1,6 @@
 "use client"
 
-import { Building, CreditCard } from "lucide-react"
+import { CreditCard, UsersRound } from "lucide-react"
 
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -16,7 +16,7 @@ export function Info() {
 	return (
 		<div className="flex items-center gap-x-4">
 			<div className="w-[60px] h-[60px] relative">
-				<Building
+				<UsersRound
 					className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1.5 border text-white object-cover"
 					size={60}
 				/>

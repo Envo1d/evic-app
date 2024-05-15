@@ -21,6 +21,11 @@ class ProjectModule extends HttpFactory {
 			.min(3, { message: "Minimum length of 3 letters is required" }),
 		imagePath: z.string().min(1, { message: "Image not selected" })
 	})
+	updateValidationSchema = z.object({
+		name: z
+			.string()
+			.min(3, { message: "Minimum length of 3 letters is required" })
+	})
 
 	async create(data: IProjectCreateForm): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>("POST", `${this.URL}`, data)

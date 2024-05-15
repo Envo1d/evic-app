@@ -13,6 +13,7 @@ import {
 	getSortedRowModel,
 	useReactTable
 } from "@tanstack/react-table"
+import { UserRoundPlus } from "lucide-react"
 import { FetchError } from "ofetch"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -71,6 +72,9 @@ export function InvitationsTable() {
 		mutationFn: (data: ITeamDeleteInviteForm) => api.team.deleteInvite(data),
 		onSuccess() {
 			refetch()
+		},
+		onError(err) {
+			if (err instanceof FetchError) toast.error(err.data.message)
 		}
 	})
 
@@ -203,7 +207,8 @@ export function InvitationsTable() {
 					disabled={searchData.length <= 0}
 					onClick={() => invite()}
 				>
-					Invite
+					<UserRoundPlus className="h-4 w-4 mr-1.5" />
+					<p>Invite</p>
 				</Button>
 			</div>
 			<div className="rounded-md border">

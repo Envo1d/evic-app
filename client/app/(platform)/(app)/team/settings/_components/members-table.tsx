@@ -14,7 +14,9 @@ import {
 	useReactTable
 } from "@tanstack/react-table"
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { FetchError } from "ofetch"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +31,13 @@ import {
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select"
 import {
 	Table,
 	TableBody,
@@ -45,7 +54,7 @@ import {
 	ITeamRoleResponse
 } from "@/types/team.types"
 
-import { useTeam } from "@/hooks/teams"
+import { useTeam, useTeamRoles, useUpdateMemberRole } from "@/hooks/teams"
 import { useProfile } from "@/hooks/useProfile"
 
 import api from "@/api"
@@ -66,10 +75,14 @@ export function MembersTable() {
 		mutationFn: (data: ITeamRemoveMemberForm) => api.team.removeMember(data),
 		onSuccess() {
 			refetch()
+		},
+		onError(err) {
+			if (err instanceof FetchError) toast.error(err.data.message)
 		}
 	})
 
-	//TODO: add role selection
+	const { roles } = useTeamRoles()
+	const { updateMemberRole, isError } = useUpdateMemberRole()
 
 	const [data, setData] = useState<ITeamMemberTableData[]>([])
 
@@ -149,8 +162,37 @@ export function MembersTable() {
 			header: () => <div className="text-right">Role</div>,
 			cell: ({ row }) => {
 				const data: ITeamRoleResponse = row.getValue("role")
+				const [role, setRole] = useState(data.id)
+				const user: ITeamMember = row.getValue("user")
 
-				return <div className="flex justify-end">{data.name}</div>
+				const onValueChanged = (value: string) => {
+					setRole(value)
+					updateMemberRole({
+						roleId: value,
+						memberId: user.memberId!
+					})
+				}
+
+				return (
+					<div className="flex justify-end">
+						<Select
+							value={role}
+							onValueChange={val => onValueChanged(val)}
+						>
+							<SelectTrigger className="w-46">
+								<SelectValue
+									placeholder="Select role"
+									defaultValue={role}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								{roles?.map(item => (
+									<SelectItem value={item.id}>{item.name}</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+				)
 			}
 		},
 		{
@@ -231,6 +273,12 @@ export function MembersTable() {
 			if (members) setData([...members])
 		}
 	}, [teamData])
+
+	useEffect(() => {
+		if (isError) {
+			table.reset()
+		}
+	}, [isError])
 
 	return (
 		<div className="w-full">

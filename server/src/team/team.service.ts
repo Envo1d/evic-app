@@ -392,6 +392,9 @@ export class TeamService {
 		return await this.prisma.teamRole.findMany({
 			where: {
 				teamId
+			},
+			orderBy: {
+				name: 'asc'
 			}
 		})
 	}

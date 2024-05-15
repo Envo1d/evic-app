@@ -1,7 +1,13 @@
 "use client"
 
 import { AccordionItem } from "@radix-ui/react-accordion"
-import { Activity, Building, CreditCard, Layout, Settings } from "lucide-react"
+import {
+	Activity,
+	CreditCard,
+	Layout,
+	Settings,
+	UsersRound
+} from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
 import { AccordionContent, AccordionTrigger } from "@/components/ui/accordion"
@@ -68,7 +74,7 @@ export function NavItem({ isActive, team }: NavItemProps) {
 			>
 				<div className="flex items-center gap-x-2">
 					<div className="w-14 h-7 relative flex items-center">
-						<Building
+						<UsersRound
 							className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 text-white"
 							size={30}
 						/>

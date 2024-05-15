@@ -24,6 +24,14 @@ class TeamModule extends HttpFactory {
 		name: z.string().min(3, { message: "Name is too short" })
 	})
 
+	createRoleValidationSchema = z.object({
+		name: z.string().min(3, { message: "Name is too short" }),
+		rights: z
+			.string()
+			.array()
+			.min(1, { message: "One position from the rights is required" })
+	})
+
 	async createTeam(data: ITeamCreateForm): Promise<ITeamResponse> {
 		const res = await this.call<ITeamResponse>(
 			"POST",
@@ -55,7 +63,7 @@ class TeamModule extends HttpFactory {
 	): Promise<ITeamMemberResponse> {
 		const res = await this.call<ITeamMemberResponse>(
 			"PATCH",
-			`${this.URL}/update-role`,
+			`${this.URL}/update-member-role`,
 			data
 		)
 

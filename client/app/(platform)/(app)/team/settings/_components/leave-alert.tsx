@@ -3,6 +3,8 @@
 import { useMutation } from "@tanstack/react-query"
 import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { FetchError } from "ofetch"
+import { toast } from "sonner"
 
 import {
 	AlertDialog,
@@ -37,6 +39,9 @@ export function LeaveAlert() {
 			}),
 		onSuccess() {
 			push("/team-selection")
+		},
+		onError(err) {
+			if (err instanceof FetchError) toast.error(err.data.message)
 		}
 	})
 

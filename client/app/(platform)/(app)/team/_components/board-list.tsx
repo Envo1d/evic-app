@@ -1,10 +1,9 @@
 "use client"
 
-import { ClipboardList, HelpCircle, User2, UserRound } from "lucide-react"
+import { User2, UserRound } from "lucide-react"
 import Link from "next/link"
 
 import { FormPopover } from "@/components/form-popover"
-import { Hint } from "@/components/hint"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useProjectsList } from "@/hooks/projects"
@@ -35,10 +34,6 @@ export function BoardList() {
 									<UserRound className="mr-1.5" />
 									<p>{board.members?.length}</p>
 								</span>
-								<span className="flex flex-row">
-									<ClipboardList className="mr-1.5" />
-									<p>{board.tasks?.length}</p>
-								</span>
 							</div>
 						</div>
 					</Link>
@@ -54,13 +49,6 @@ export function BoardList() {
 						className="aspect-video relative h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition"
 					>
 						<p className="text-sm font-semibold">Create new board</p>
-						<span className="text-xs">5 remaining</span>
-						<Hint
-							sideOffset={40}
-							description={`Free Workspaces can have up to 5 open boards. For unlimited boards upgrade this team`}
-						>
-							<HelpCircle className="absolute bottom-2 right-2 h-[14px] w-[14px]" />
-						</Hint>
 					</div>
 				</FormPopover>
 			</div>

@@ -28,6 +28,7 @@ export function Settings() {
 	})
 
 	useInitialSettings(form.reset)
+
 	const { mutate, isPending } = useUpdateSettings()
 
 	const onSubmit: SubmitHandler<TypeUserForm> = data => {

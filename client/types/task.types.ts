@@ -1,5 +1,5 @@
 import { ICommentResponse } from "./comment.types"
-import { IProjectResponse } from "./project.types"
+import { IProjectListResponse } from "./project.types"
 import type { IBase } from "./root.types"
 import { IUser } from "./user.types"
 
@@ -17,6 +17,7 @@ export interface ITaskExecutorResponse extends IBase {
 export interface ITaskResponse extends IBase {
 	name: string
 	priority?: EnumTaskPriority
+	order: number
 	status?: boolean
 	description?: string
 	imagePath: string
@@ -24,7 +25,8 @@ export interface ITaskResponse extends IBase {
 	color?: string
 	comments?: ICommentResponse[]
 	taskExecutor?: ITaskExecutorResponse
-	project: IProjectResponse
+	list: IProjectListResponse
+	listId: string
 }
 
 export type TypeTaskFormState = Partial<Omit<ITaskResponse, "id" | "updatedAt">>

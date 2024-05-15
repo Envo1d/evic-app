@@ -70,7 +70,7 @@ export type TypeTeamCreateFormState = Partial<ITeamCreateForm>
 
 export interface ITeamCreateRoleForm {
 	name: string
-	rights: EnumTeamRights[]
+	rights: string[]
 }
 
 export type TypeTeamCreateRoleFormState = Partial<ITeamCreateRoleForm>
@@ -115,6 +115,12 @@ export interface ITeamMemberTableData {
 		name: string
 	}
 	joined: string
+}
+
+export interface ITeamRoleTableData {
+	roleId: string
+	name: string
+	rights: EnumTeamRights[]
 }
 
 export interface ITeamMember {
