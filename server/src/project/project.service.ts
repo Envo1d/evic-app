@@ -10,7 +10,7 @@ import { UpdateProjectDto } from './dto/update-project.dto'
 export class ProjectService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(dto: CreateProjectDto, userId: string) {
+	async create(dto: CreateProjectDto) {
 		const [imageId, imageThumbUrl, imageFullUrl, imageLinkHTML, imageUserName] =
 			dto.imagePath.split('|')
 		if (
@@ -71,7 +71,7 @@ export class ProjectService {
 		})
 	}
 
-	async addMember(dto: AddProjectMemberDto, userId: string) {
+	async addMember(dto: AddProjectMemberDto) {
 		return await this.prisma.projectMember.create({
 			data: {
 				project: {
@@ -88,7 +88,7 @@ export class ProjectService {
 		})
 	}
 
-	async deleteMember(dto: RemoveProjectMemberDto, userId: string) {
+	async deleteMember(dto: RemoveProjectMemberDto) {
 		return await this.prisma.projectMember.delete({
 			where: {
 				id: dto.projectMemberId,
@@ -98,7 +98,7 @@ export class ProjectService {
 		})
 	}
 
-	async getAllByTeamId(teamId: string, userId: string) {
+	async getAllByTeamId(teamId: string) {
 		return await this.prisma.project.findMany({
 			where: {
 				teamId: teamId
@@ -109,9 +109,13 @@ export class ProjectService {
 						id: true
 					}
 				},
-				tasks: {
-					select: {
-						id: true
+				lists: {
+					include: {
+						tasks: {
+							select: {
+								id: true
+							}
+						}
 					}
 				}
 			},
@@ -121,10 +125,11 @@ export class ProjectService {
 		})
 	}
 
-	async getDetails(projectId: string, userId: string) {
+	async getDetails(projectId: string, teamId: string) {
 		return await this.prisma.project.findUnique({
 			where: {
-				id: projectId
+				id: projectId,
+				teamId
 			},
 			include: {
 				members: {
@@ -144,28 +149,11 @@ export class ProjectService {
 						}
 					}
 				},
-				tasks: {
+				lists: {
 					include: {
-						comments: {
+						tasks: {
 							include: {
-								teamMember: {
-									select: {
-										user: {
-											select: {
-												email: true,
-												nickname: true,
-												firstName: true,
-												lastName: true,
-												avatarPath: true
-											}
-										}
-									}
-								}
-							}
-						},
-						taskExecutor: {
-							include: {
-								projectMember: {
+								comments: {
 									include: {
 										teamMember: {
 											select: {
@@ -176,6 +164,27 @@ export class ProjectService {
 														firstName: true,
 														lastName: true,
 														avatarPath: true
+													}
+												}
+											}
+										}
+									}
+								},
+								taskExecutor: {
+									include: {
+										projectMember: {
+											include: {
+												teamMember: {
+													select: {
+														user: {
+															select: {
+																email: true,
+																nickname: true,
+																firstName: true,
+																lastName: true,
+																avatarPath: true
+															}
+														}
 													}
 												}
 											}

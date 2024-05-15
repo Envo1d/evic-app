@@ -11,12 +11,20 @@ export interface IProjectResponse extends IBase {
 	imageFullUrl: string
 	imageUserName: string
 	imageLinkHTML: string
-	tasks?: ITaskResponse[]
+	lists?: IProjectListResponse[]
 	members?: IProjectMemberResponse[]
 	owner: IUser
 	ownerId: string
 	team: ITeamResponse
 	teamId: string
+}
+
+export interface IProjectListResponse extends IBase {
+	title: string
+	order: number
+	tasks: ITaskResponse[]
+	project: IProjectResponse
+	projectId: string
 }
 
 export interface IProjectMemberResponse extends IBase {
@@ -44,10 +52,12 @@ export interface IFindProjectsForm {
 
 export interface IDeleteProjectForm {
 	teamId: string
-	teamMemberId: string
 }
 
-export interface IProjectUpdateForm extends IProjectCreateForm {}
+export interface IProjectUpdateForm {
+	name: string
+	teamId: string
+}
 
 export interface IProjectAddMemberForm {
 	teamMemberId: string
@@ -58,5 +68,4 @@ export interface IProjectRemoveMemberForm {
 	projectMemberId: string
 	projectId: string
 	teamId: string
-	teamMemberId: string
 }

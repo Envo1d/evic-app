@@ -1,7 +1,6 @@
 "use client"
 
-import { Building, ChevronsUpDown } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ChevronsUpDown, UsersRound } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import { useGetActiveTeam, useSetActiveTeam } from "@/hooks/teams"
@@ -22,7 +21,6 @@ import { cn } from "@/lib/utils"
 
 export function TeamSelector() {
 	const { data: teams, isLoading } = useTeamList()
-	const { push } = useRouter()
 
 	const { setActiveTeam } = useSetActiveTeam()
 	const { data, isLoading: isActiveTeamLoading } = useGetActiveTeam()
@@ -59,7 +57,7 @@ export function TeamSelector() {
 				>
 					{value !== "0" ? (
 						<div className="flex flex-row gap-1 items-center w-full">
-							<Building
+							<UsersRound
 								className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 border text-white"
 								size={35}
 							/>
@@ -97,7 +95,7 @@ export function TeamSelector() {
 													: ""
 											)}
 										>
-											<Building
+											<UsersRound
 												className="bg-gradient-to-tr from-violet-500 to-blue-500 w-11 h-11 rounded-md p-1 text-white"
 												size={35}
 											/>

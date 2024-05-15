@@ -4,8 +4,4 @@ export class RemoveProjectDto {
 	@IsString()
 	@IsNotEmpty()
 	teamId: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamMemberId: string
 }

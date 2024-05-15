@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { FetchError } from "ofetch"
 import { toast } from "sonner"
 
 import { IProjectCreateForm } from "@/types/project.types"
@@ -19,7 +20,7 @@ export function useCreateProject() {
 			push(`/board/${res.id}`)
 		},
 		onError(error) {
-			toast.error(error.message)
+			if (error instanceof FetchError) toast.error(error.data.message)
 		}
 	})
 

@@ -10,8 +10,8 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { Auth } from '../auth/decorators/auth.decorator'
-import { CurrentUser } from '../auth/decorators/user.decorator'
+import { AuthTeamMember } from 'src/team/decorators/auth-team-member.decorator'
+import { CurrentTeam } from '../team/decorators/team.decorator'
 import { AddProjectMemberDto } from './dto/add-member.dto'
 import { CreateProjectDto } from './dto/create-project.dto'
 import { RemoveProjectMemberDto } from './dto/remove-member.dto'
@@ -25,54 +25,45 @@ export class ProjectController {
 
 	@Post()
 	@HttpCode(200)
-	@Auth()
+	@AuthTeamMember(['create_project'])
 	@UsePipes(new ValidationPipe())
-	create(@Body() dto: CreateProjectDto, @CurrentUser('id') userId: string) {
-		return this.projectService.create(dto, userId)
+	create(@Body() dto: CreateProjectDto) {
+		return this.projectService.create(dto)
 	}
 
 	@Post('add-member')
 	@HttpCode(200)
-	@Auth()
+	@AuthTeamMember(['invite_member'])
 	@UsePipes(new ValidationPipe())
-	addMember(
-		@Body() dto: AddProjectMemberDto,
-		@CurrentUser('id') userId: string
-	) {
-		return this.projectService.addMember(dto, userId)
+	addMember(@Body() dto: AddProjectMemberDto) {
+		return this.projectService.addMember(dto)
 	}
 
 	@Put('delete-member')
 	@HttpCode(200)
-	@Auth()
+	@AuthTeamMember(['delete_member'])
 	@UsePipes(new ValidationPipe())
-	deleteMember(
-		@Body() dto: RemoveProjectMemberDto,
-		@CurrentUser('id') userId: string
-	) {
-		return this.projectService.deleteMember(dto, userId)
+	deleteMember(@Body() dto: RemoveProjectMemberDto) {
+		return this.projectService.deleteMember(dto)
 	}
 
-	@Auth()
-	@Get('by-team/:id')
-	getAllByTeam(
-		@Param('id') projectId: string,
-		@CurrentUser('id') userId: string
-	) {
-		return this.projectService.getAllByTeamId(projectId, userId)
+	@AuthTeamMember()
+	@Get('by-team')
+	getAllByTeam(@CurrentTeam() teamId: string) {
+		return this.projectService.getAllByTeamId(teamId)
 	}
 
-	@Auth()
+	@AuthTeamMember()
 	@Get('details/:id')
 	getProjectDetails(
 		@Param('id') projectId: string,
-		@CurrentUser('id') userId: string
+		@CurrentTeam() teamId: string
 	) {
-		return this.projectService.getDetails(projectId, userId)
+		return this.projectService.getDetails(projectId, teamId)
 	}
 
 	@HttpCode(200)
-	@Auth()
+	@AuthTeamMember(['edit_project'])
 	@UsePipes(new ValidationPipe())
 	@Patch(':id')
 	update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
@@ -80,7 +71,7 @@ export class ProjectController {
 	}
 
 	@HttpCode(200)
-	@Auth()
+	@AuthTeamMember(['delete_project'])
 	@UsePipes(new ValidationPipe())
 	@Put('delete/:id')
 	remove(@Param('id') id: string, @Body() dto: RemoveProjectDto) {
