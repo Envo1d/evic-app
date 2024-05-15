@@ -3,16 +3,28 @@ import type { IBase } from "./root.types"
 import { IUser } from "./user.types"
 
 export enum EnumTeamRights {
-	create = "create",
-	edit = "edit",
-	delete = "delete",
-	add_member = "add_member",
-	edit_member = "edit_member",
-	delete_member = "delete_member"
+	create_team = "create_team",
+	create_project = "create_project",
+	create_task = "create_task",
+	create_role = "create_role",
+	edit_team = "edit_team",
+	edit_project = "edit_project",
+	edit_task = "edit_task",
+	edit_role = "edit_role",
+	delete_team = "delete_team",
+	delete_project = "delete_project",
+	delete_task = "delete_task",
+	delete_role = "delete_role",
+	invite_member = "invite_member",
+	delete_invited_member = "delete_invited_member",
+	delete_member = "delete_member",
+	set_member_project = "set_member_project",
+	set_member_role = "set_member_role",
+	set_task_executor = "set_task_executor",
+	full_access = "full_access"
 }
 
 export interface IUserTeams {
-	createdByUser: ITeamResponse[]
 	member: ITeamResponse[]
 }
 
@@ -22,14 +34,25 @@ export interface ITeamResponse extends IBase {
 	creatorId: string
 	members?: ITeamMemberResponse[]
 	roles?: ITeamRoleResponse[]
-	projects?: number
 }
 
 export interface ITeamMemberResponse extends IBase {
 	role: ITeamRoleResponse
 	user: IUser
+	userId: string
 	team: ITeamResponse
+	teamId: string
 	projectMembership?: IProjectMemberResponse[]
+}
+
+export interface IActiveTeamMemberResponse extends IBase {
+	activeTeamMemberId: string
+	activeTeamId: string
+	activeRole: {
+		name: string
+		rights: EnumTeamRights[]
+		id: string
+	}
 }
 
 export interface ITeamRoleResponse extends IBase {
@@ -48,7 +71,6 @@ export type TypeTeamCreateFormState = Partial<ITeamCreateForm>
 export interface ITeamCreateRoleForm {
 	name: string
 	rights: EnumTeamRights[]
-	teamId: string
 }
 
 export type TypeTeamCreateRoleFormState = Partial<ITeamCreateRoleForm>
@@ -73,26 +95,17 @@ export interface ITeamInvitationsTable {
 	candidateId?: string
 }
 
-export interface ITeamSetMemberRoleForm {
-	userId: string
-	teamId: string
-	roleId: string
-}
-
 export interface ITeamUpdateMemberRoleForm {
 	memberId: string
-	teamId: string
 	roleId: string
 }
 
 export interface ITeamAddMemberForm {
 	candidateEmail: string
-	teamId: string
 }
 
 export interface ITeamRemoveMemberForm {
 	memberId: string
-	userId: string
 }
 
 export interface ITeamMemberTableData {
@@ -117,5 +130,4 @@ export interface ITeamMember {
 export interface ITeamDeleteInviteForm {
 	invitationId: string
 	candidateId: string
-	teamId: string
 }

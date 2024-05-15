@@ -6,7 +6,11 @@ import { IUser } from "./user.types"
 export interface IProjectResponse extends IBase {
 	name: string
 	description?: string
-	imagePath?: string
+	imageId: string
+	imageThumbUrl: string
+	imageFullUrl: string
+	imageUserName: string
+	imageLinkHTML: string
 	tasks?: ITaskResponse[]
 	members?: IProjectMemberResponse[]
 	owner: IUser
@@ -26,6 +30,7 @@ export interface IProjectCreateForm {
 	name: string
 	teamId: string
 	teamMemberId: string
+	imagePath: string
 }
 
 export interface IFindProjectForm {
@@ -33,8 +38,13 @@ export interface IFindProjectForm {
 	teamId: string
 }
 
+export interface IFindProjectsForm {
+	teamId: string
+}
+
 export interface IDeleteProjectForm {
 	teamId: string
+	teamMemberId: string
 }
 
 export interface IProjectUpdateForm extends IProjectCreateForm {}

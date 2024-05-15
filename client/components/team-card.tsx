@@ -1,7 +1,8 @@
 import { Building, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-import { useAppStore } from "@/providers/store-provider"
+import { useGetActiveTeam, useSetActiveTeam } from "@/hooks/teams"
 
 interface ITeamCard {
 	name: string
@@ -9,14 +10,18 @@ interface ITeamCard {
 }
 
 export function TeamCard({ name, id }: ITeamCard) {
-	const { setActiveTeamId } = useAppStore(state => state)
-
 	const { push } = useRouter()
 
+	const { setActiveTeam, isSuccess } = useSetActiveTeam()
+	const { data } = useGetActiveTeam()
+
 	const click = () => {
-		setActiveTeamId(id)
-		push("/team")
+		setActiveTeam(id)
 	}
+
+	useEffect(() => {
+		if (isSuccess && data?.activeTeamId === id) push("/team")
+	}, [isSuccess, data])
 
 	return (
 		<div className="bg-slate-100 p-2 rounded-lg shadow-md hover:translate-x-1 hover:bg-slate-200 transition-all flex flex-row justify-between items-center hover:shadow-xl mb-3">

@@ -8,12 +8,11 @@ import { configuration } from './config/configuration'
 import { AppConfig } from './config/configuration.interface'
 import { Environment, validate } from './config/env.validation'
 import { PrismaModule } from './prisma/prisma.module'
+import { ProjectModule } from './project/project.module'
 import { TaskModule } from './task/task.module'
-import { TimeBlockModule } from './time-block/time-block.module'
+import { TeamModule } from './team/team.module'
 import { TimerModule } from './timer/timer.module'
 import { UserModule } from './user/user.module'
-import { TeamModule } from './team/team.module';
-import { ProjectModule } from './project/project.module';
 
 @Module({
 	imports: [
@@ -59,7 +58,6 @@ import { ProjectModule } from './project/project.module';
 		UserModule,
 		PrismaModule,
 		TaskModule,
-		TimeBlockModule,
 		TimerModule,
 		TeamModule,
 		ProjectModule

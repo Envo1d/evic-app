@@ -1,7 +1,6 @@
 "use client"
 
 import { AccordionItem } from "@radix-ui/react-accordion"
-import { useQueryClient } from "@tanstack/react-query"
 import { Activity, Building, CreditCard, Layout, Settings } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
@@ -9,11 +8,10 @@ import { AccordionContent, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import { useAppStore } from "@/providers/store-provider"
-
 import { ITeamResponse } from "@/types/team.types"
 
-import api from "@/api"
+import { useGetActiveTeam, useSetActiveTeam } from "@/hooks/teams"
+
 import { cn } from "@/lib/utils"
 
 interface NavItemProps {
@@ -47,16 +45,12 @@ const routes = [
 export function NavItem({ isActive, team }: NavItemProps) {
 	const { push } = useRouter()
 	const pathname = usePathname()
-	const { activeTeamId, setActiveTeamId } = useAppStore(state => state)
-	const queryClient = useQueryClient()
+	const { data } = useGetActiveTeam()
+	const { setActiveTeam } = useSetActiveTeam()
 
 	const onClick = async (href: string) => {
-		if (activeTeamId !== team.id) {
-			setActiveTeamId(team.id)
-			await queryClient.fetchQuery({
-				queryKey: ["team"],
-				queryFn: () => api.team.getTeamDetails(team.id)
-			})
+		if (data?.activeTeamId !== team.id) {
+			setActiveTeam(team.id)
 		}
 		push(href)
 	}
@@ -91,7 +85,7 @@ export function NavItem({ isActive, team }: NavItemProps) {
 						className={cn(
 							"w-full font-medium justify-start pl-10 mb-1",
 							pathname === route.href &&
-								activeTeamId === team.id &&
+								data?.activeTeamId === team.id &&
 								"bg-sky-500/10 text-sky-700"
 						)}
 						variant="ghost"

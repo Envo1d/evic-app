@@ -1,12 +1,12 @@
 import {
 	Body,
 	Controller,
-	Delete,
 	Get,
 	HttpCode,
 	Param,
 	Patch,
 	Post,
+	Put,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
@@ -14,7 +14,6 @@ import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
 import { AddProjectMemberDto } from './dto/add-member.dto'
 import { CreateProjectDto } from './dto/create-project.dto'
-import { FindProjectDto } from './dto/find-project.dto'
 import { RemoveProjectMemberDto } from './dto/remove-member.dto'
 import { RemoveProjectDto } from './dto/remove-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
@@ -43,7 +42,7 @@ export class ProjectController {
 		return this.projectService.addMember(dto, userId)
 	}
 
-	@Delete('delete-member')
+	@Put('delete-member')
 	@HttpCode(200)
 	@Auth()
 	@UsePipes(new ValidationPipe())
@@ -55,18 +54,21 @@ export class ProjectController {
 	}
 
 	@Auth()
-	@Get('by-team')
-	getAllByTeam(@Body() dto: FindProjectDto, @CurrentUser('id') userId: string) {
-		return this.projectService.getAllByTeamId(dto, userId)
+	@Get('by-team/:id')
+	getAllByTeam(
+		@Param('id') projectId: string,
+		@CurrentUser('id') userId: string
+	) {
+		return this.projectService.getAllByTeamId(projectId, userId)
 	}
 
 	@Auth()
-	@Get('details')
+	@Get('details/:id')
 	getProjectDetails(
-		@Body() dto: FindProjectDto,
+		@Param('id') projectId: string,
 		@CurrentUser('id') userId: string
 	) {
-		return this.projectService.getDetails(dto, userId)
+		return this.projectService.getDetails(projectId, userId)
 	}
 
 	@HttpCode(200)
@@ -80,7 +82,7 @@ export class ProjectController {
 	@HttpCode(200)
 	@Auth()
 	@UsePipes(new ValidationPipe())
-	@Delete(':id')
+	@Put('delete/:id')
 	remove(@Param('id') id: string, @Body() dto: RemoveProjectDto) {
 		return this.projectService.remove(id, dto)
 	}

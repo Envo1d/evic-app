@@ -17,13 +17,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-import { useAppStore } from "@/providers/store-provider"
-
 import api from "@/api"
 
 export function DeleteAlert() {
 	const { push } = useRouter()
-	const { activeTeamId } = useAppStore(state => state)
 
 	const submit = () => {
 		mutate()
@@ -31,7 +28,7 @@ export function DeleteAlert() {
 
 	const { mutate } = useMutation({
 		mutationKey: ["delete team"],
-		mutationFn: () => api.team.deleteTeam(activeTeamId),
+		mutationFn: () => api.team.deleteTeam(),
 		onSuccess() {
 			push("/team-selection")
 		}

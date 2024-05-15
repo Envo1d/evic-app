@@ -1,5 +1,5 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import { valibotResolver } from "@hookform/resolvers/valibot"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Building } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -27,8 +27,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 
-import { useAppStore } from "@/providers/store-provider"
-
 import { ITeamCreateForm } from "@/types/team.types"
 
 import { useTeam } from "@/hooks/teams"
@@ -41,11 +39,10 @@ import api from "@/api"
 export function SettingsTab() {
 	const { data: team } = useTeam()
 	const { data: profile } = useProfile()
-	const { activeTeamId } = useAppStore(state => state)
 
 	const form = useForm<ITeamCreateForm>({
 		mode: "onChange",
-		resolver: valibotResolver(api.team.createTeamValidationSchema),
+		resolver: zodResolver(api.team.createTeamValidationSchema),
 		defaultValues: {
 			name: ""
 		}
@@ -55,8 +52,7 @@ export function SettingsTab() {
 
 	const { mutate } = useMutation({
 		mutationKey: ["update team"],
-		mutationFn: (data: ITeamCreateForm) =>
-			api.team.updateTeam(activeTeamId, data),
+		mutationFn: (data: ITeamCreateForm) => api.team.updateTeam(data),
 		onSuccess() {
 			queryClient.invalidateQueries({
 				queryKey: ["team"]

@@ -13,6 +13,7 @@ import {
 	getSortedRowModel,
 	useReactTable
 } from "@tanstack/react-table"
+import { FetchError } from "ofetch"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -28,8 +29,6 @@ import {
 	TableRow
 } from "@/components/ui/table"
 
-import { useAppStore } from "@/providers/store-provider"
-
 import {
 	ITeamDeleteInviteForm,
 	ITeamInvitationsTable
@@ -39,27 +38,31 @@ import { IUser } from "@/types/user.types"
 import api from "@/api"
 
 export function InvitationsTable() {
-	const { activeTeamId } = useAppStore(state => state)
-
 	const {
 		data: invitations,
 		refetch,
 		isLoading
 	} = useQuery({
 		queryKey: ["invitations"],
-		queryFn: () => api.team.getTeamInvitations(activeTeamId)
+		queryFn: () => api.team.getTeamInvitations()
 	})
 
 	const { mutate: invite } = useMutation({
 		mutationKey: ["invite user"],
 		mutationFn: () =>
 			api.team.inviteMember({
-				teamId: activeTeamId,
 				candidateEmail: searchData
 			}),
-		onSuccess(res) {
+		onSuccess() {
 			toast.success(`${searchData} invited!`)
 			refetch()
+			setSearchData("")
+		},
+		onError(err) {
+			if (err instanceof FetchError) {
+				toast.error(err.data.message)
+				setSearchData("")
+			}
 		}
 	})
 
@@ -95,12 +98,16 @@ export function InvitationsTable() {
 									data?.email.charAt(0)}
 							</AvatarFallback>
 						</Avatar>
-						<div className="flex flex-row items-center gap-x-1">
-							<p className="font-semibold text-base">
-								{data?.nickname ||
-									(data.firstName && `${data?.firstName} ${data?.lastName}`) ||
-									data?.email}
-							</p>
+						<div className="flex flex-row items-center gap-x-3 w-full">
+							<div className="flex flex-col gap-y-px">
+								{data.email && data.lastName && (
+									<p className="font-semibold text-base">
+										{data?.firstName} {data?.lastName}
+									</p>
+								)}
+								<p className="font-light text-sm">{data?.email}</p>
+								{data.nickname && <p className="">{data?.nickname}</p>}
+							</div>
 						</div>
 					</div>
 				)
@@ -131,7 +138,6 @@ export function InvitationsTable() {
 							variant="destructive"
 							onClick={() =>
 								deleteInv({
-									teamId: activeTeamId,
 									invitationId: id,
 									candidateId: candidate.id
 								})

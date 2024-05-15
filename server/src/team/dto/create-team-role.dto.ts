@@ -5,6 +5,7 @@ import {
 	ArrayNotEmpty,
 	IsEnum,
 	IsNotEmpty,
+	IsOptional,
 	IsString
 } from 'class-validator'
 
@@ -18,8 +19,16 @@ export class CreateTeamRoleDto {
 	@ArrayMaxSize(6)
 	@ArrayNotEmpty()
 	rights: Rights[]
+}
 
+export class UpdateTeamRoleDto {
 	@IsString()
-	@IsNotEmpty()
-	teamId: string
+	@IsOptional()
+	name?: string
+
+	@IsEnum(Rights, { each: true })
+	@ArrayMinSize(1)
+	@ArrayMaxSize(6)
+	@IsOptional()
+	rights?: Rights[]
 }

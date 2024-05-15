@@ -7,7 +7,6 @@ import AuthModule from "@/repository/modules/auth.module"
 import ProjectModule from "@/repository/modules/project.module"
 import TaskModule from "@/repository/modules/task.module"
 import TeamModule from "@/repository/modules/team.module"
-import TimeBlockModule from "@/repository/modules/time-block.module"
 import TimerModule from "@/repository/modules/timer.module"
 import TokenModule from "@/repository/modules/token.module"
 import UserModule from "@/repository/modules/user.module"
@@ -23,7 +22,6 @@ export interface IApiInstance {
 	auth: AuthModule
 	user: UserModule
 	timer: TimerModule
-	timeBlock: TimeBlockModule
 	task: TaskModule
 	team: TeamModule
 	project: ProjectModule

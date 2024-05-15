@@ -1,4 +1,4 @@
-import { type $Fetch } from 'ofetch'
+import { type $Fetch } from "ofetch"
 
 class HttpFactory {
 	private $fetch: $Fetch
@@ -17,7 +17,11 @@ class HttpFactory {
 		data?: object,
 		extras = {}
 	): Promise<T> {
-		const $res: T = await this.$fetch(url, { method, body: data, ...extras })
+		const $res: T = await this.$fetch(url, {
+			method,
+			body: data,
+			...extras
+		})
 		return $res
 	}
 }

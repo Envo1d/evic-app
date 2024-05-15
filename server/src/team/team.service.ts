@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { Rights } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { UserService } from '../user/user.service'
 import { AddMemberDto, DeleteInvitedMemberDto } from './dto/add-member.dto'
-import { CreateTeamRoleDto } from './dto/create-team-role.dto'
+import {
+	CreateTeamRoleDto,
+	UpdateTeamRoleDto
+} from './dto/create-team-role.dto'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { RemoveMemberDto } from './dto/remove-member.dto'
-import {
-	SetMemberRoleDto,
-	UpdateMemberRoleDto
-} from './dto/update-member-role.dto'
+import { UpdateMemberRoleDto } from './dto/update-member-role.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
 
 @Injectable()
@@ -20,7 +19,7 @@ export class TeamService {
 	) {}
 
 	async create(dto: CreateTeamDto, userId: string) {
-		return await this.prisma.team.create({
+		const team = await this.prisma.team.create({
 			data: {
 				name: dto.name,
 				creator: {
@@ -33,14 +32,7 @@ export class TeamService {
 						data: [
 							{
 								name: 'Admin',
-								rights: [
-									'add_member',
-									'create',
-									'delete',
-									'delete_member',
-									'edit',
-									'edit_member'
-								]
+								rights: ['full_access']
 							},
 							{
 								name: 'Member',
@@ -49,209 +41,231 @@ export class TeamService {
 						]
 					}
 				}
+			},
+			include: {
+				roles: true
+			}
+		})
+
+		const teamMember = await this.prisma.teamMember.create({
+			data: {
+				user: {
+					connect: {
+						id: userId
+					}
+				},
+				team: {
+					connect: {
+						id: team.id
+					}
+				},
+				role: {
+					connect: {
+						id: team.roles.find(item => item.name === 'Admin').id
+					}
+				}
+			}
+		})
+
+		await this.prisma.userActiveTeamMember.create({
+			data: {
+				user: {
+					connect: {
+						id: userId
+					}
+				},
+				activeTeamMember: {
+					connect: {
+						id: teamMember.id
+					}
+				}
+			}
+		})
+
+		return team
+	}
+
+	async updateActiveTeamMember(teamId: string, userId: string) {
+		const user = await this.isMember(teamId, userId)
+		if (user.member) {
+			const newData = await this.prisma.teamMember.findFirst({
+				where: {
+					teamId,
+					userId
+				},
+				select: {
+					id: true
+				}
+			})
+
+			await this.prisma.userActiveTeamMember.delete({
+				where: {
+					userId
+				}
+			})
+
+			const data = await this.prisma.userActiveTeamMember.create({
+				data: {
+					user: {
+						connect: {
+							id: userId
+						}
+					},
+					activeTeamMember: {
+						connect: {
+							id: newData.id
+						}
+					}
+				},
+				include: {
+					activeTeamMember: {
+						include: {
+							team: {
+								select: {
+									id: true
+								}
+							},
+							role: {
+								select: {
+									name: true,
+									rights: true,
+									id: true
+								}
+							}
+						}
+					}
+				}
+			})
+			return {
+				activeTeamId: data.activeTeamMember.teamId,
+				activeRole: {
+					name: data.activeTeamMember.role.name,
+					rights: data.activeTeamMember.role.rights,
+					id: data.activeTeamMember.role.id
+				},
+				activeTeamMemberId: data.activeTeamMemberId
+			}
+		}
+	}
+
+	async getActiveTeamMember(userId: string) {
+		const data = await this.prisma.userActiveTeamMember.findFirst({
+			where: {
+				userId
+			},
+			include: {
+				activeTeamMember: {
+					include: {
+						team: {
+							select: {
+								id: true
+							}
+						},
+						role: {
+							select: {
+								name: true,
+								rights: true,
+								id: true
+							}
+						}
+					}
+				}
+			}
+		})
+		if (!data) throw new BadRequestException('Active team not found')
+		return {
+			activeTeamId: data.activeTeamMember.teamId,
+			activeRole: {
+				name: data.activeTeamMember.role.name,
+				rights: data.activeTeamMember.role.rights,
+				id: data.activeTeamMember.role.id
+			},
+			activeTeamMemberId: data.activeTeamMemberId
+		}
+	}
+
+	async createRole(dto: CreateTeamRoleDto, teamId: string) {
+		return await this.prisma.teamRole.create({
+			data: {
+				name: dto.name,
+				rights: dto.rights,
+
+				team: {
+					connect: {
+						id: teamId
+					}
+				}
 			}
 		})
 	}
 
-	async createRole(dto: CreateTeamRoleDto, userId: string) {
-		const user = await this.isCreatorOrMember(dto.teamId, userId)
-
-		if (user.creator)
-			return await this.prisma.teamRole.create({
-				data: {
-					name: dto.name,
-					rights: dto.rights,
-					team: {
-						connect: {
-							id: dto.teamId
-						}
-					}
-				}
-			})
-		if (user.member) {
-			if (
-				(
-					await this.memberRights(user.memberData.id, user.memberData.teamId)
-				).role.rights.includes(Rights.add_member)
-			) {
-				return await this.prisma.teamRole.create({
-					data: {
-						name: dto.name,
-						rights: dto.rights,
-						team: {
-							connect: {
-								id: dto.teamId
-							}
-						}
-					}
-				})
+	async updateRole(dto: UpdateTeamRoleDto, teamId: string, roleId: string) {
+		return await this.prisma.teamRole.update({
+			where: {
+				id: roleId,
+				teamId
+			},
+			data: {
+				name: dto.name,
+				rights: dto.rights
 			}
-		}
+		})
 	}
 
-	async setMemberRole(dto: SetMemberRoleDto, userId: string) {
-		const user = await this.isCreatorOrMember(dto.teamId, userId)
-
-		if (user.creator)
-			return await this.prisma.teamMember.create({
-				data: {
-					user: {
-						connect: {
-							id: dto.userId
-						}
-					},
-					team: {
-						connect: {
-							id: dto.teamId
-						}
-					},
-					role: {
-						connect: {
-							id: dto.roleId
-						}
-					}
-				}
-			})
-		if (user.member) {
-			if (
-				(
-					await this.memberRights(user.memberData.id, user.memberData.teamId)
-				).role.rights.includes(Rights.edit_member)
-			) {
-				return await this.prisma.teamMember.create({
-					data: {
-						user: {
-							connect: {
-								id: dto.userId
-							}
-						},
-						team: {
-							connect: {
-								id: dto.teamId
-							}
-						},
-						role: {
-							connect: {
-								id: dto.roleId
-							}
-						}
-					}
-				})
+	async deleteRole(id: string, teamId: string) {
+		return await this.prisma.teamRole.delete({
+			where: {
+				id,
+				teamId
 			}
-		}
+		})
 	}
 
-	async updateMemberRole(dto: UpdateMemberRoleDto, userId: string) {
-		const user = await this.isCreatorOrMember(dto.teamId, userId)
-		if (user.creator)
-			return await this.prisma.teamMember.update({
-				where: {
-					id: dto.memberId,
-					teamId: dto.teamId
-				},
-				data: {
-					role: {
-						connect: {
-							id: dto.roleId
-						}
+	async updateMemberRole(dto: UpdateMemberRoleDto, teamId: string) {
+		return await this.prisma.teamMember.update({
+			where: {
+				id: dto.memberId,
+				teamId: teamId
+			},
+			data: {
+				role: {
+					connect: {
+						id: dto.roleId
 					}
 				}
-			})
-		if (user.member) {
-			if (
-				(
-					await this.memberRights(user.memberData.id, user.memberData.teamId)
-				).role.rights.includes(Rights.edit_member)
-			) {
-				return await this.prisma.teamMember.update({
-					where: {
-						id: dto.memberId,
-						teamId: dto.teamId
-					},
-					data: {
-						role: {
-							connect: {
-								id: dto.roleId
-							}
-						}
-					}
-				})
 			}
-		}
+		})
 	}
 
-	async inviteMember(userId: string, dto: AddMemberDto) {
-		const user = await this.isCreatorOrMember(dto.teamId, userId)
-
+	async inviteMember(dto: AddMemberDto, teamId: string) {
 		const candidate = await this.userService.getByEmail(dto.candidateEmail)
+
 		if (!candidate) throw new BadRequestException('User not found')
 
-		if (user.creator) {
-			return await this.prisma.teamInvitation.create({
-				data: {
-					candidate: {
-						connect: {
-							id: candidate.id
-						}
-					},
-					team: {
-						connect: {
-							id: dto.teamId
-						}
+		return await this.prisma.teamInvitation.create({
+			data: {
+				candidate: {
+					connect: {
+						email: dto.candidateEmail
+					}
+				},
+				team: {
+					connect: {
+						id: teamId
 					}
 				}
-			})
-		}
-		if (user.member) {
-			const rights = await this.memberRights(
-				user.memberData.id,
-				user.memberData.teamId
-			)
-			if (rights.role.rights.includes(Rights.add_member)) {
-				return await this.prisma.teamInvitation.create({
-					data: {
-						candidate: {
-							connect: {
-								email: dto.candidateEmail
-							}
-						},
-						team: {
-							connect: {
-								id: dto.teamId
-							}
-						}
-					}
-				})
-			} else throw new BadRequestException("You don't have enough rights")
-		}
+			}
+		})
 	}
 
-	async deleteInvitedMember(userId: string, dto: DeleteInvitedMemberDto) {
-		const user = await this.isCreatorOrMember(dto.teamId, userId)
-		if (user.creator) {
-			return await this.prisma.teamInvitation.delete({
-				where: {
-					id: dto.invitationId,
-					teamId: dto.teamId,
-					candidateId: dto.candidateId
-				}
-			})
-		}
-		if (user.member) {
-			const rights = await this.memberRights(
-				user.memberData.id,
-				user.memberData.teamId
-			)
-			if (rights.role.rights.includes(Rights.edit_member)) {
-				return await this.prisma.teamInvitation.delete({
-					where: {
-						id: dto.invitationId,
-						teamId: dto.teamId,
-						candidateId: dto.candidateId
-					}
-				})
-			} else throw new BadRequestException("You don't have enough rights")
-		}
+	async deleteInvitedMember(dto: DeleteInvitedMemberDto, teamId: string) {
+		return await this.prisma.teamInvitation.delete({
+			where: {
+				id: dto.invitationId,
+				teamId: teamId,
+				candidateId: dto.candidateId
+			}
+		})
 	}
 
 	async acceptInvite(inviteId: string, userId: string) {
@@ -321,9 +335,7 @@ export class TeamService {
 		return true
 	}
 
-	async getTeamInvitations(teamId: string, userId: string) {
-		await this.isCreatorOrMember(teamId, userId)
-
+	async getTeamInvitations(teamId: string) {
 		return await this.prisma.teamInvitation.findMany({
 			where: {
 				teamId
@@ -354,130 +366,77 @@ export class TeamService {
 		})
 	}
 
-	private async memberRights(memberId: string, teamId: string) {
-		return this.prisma.teamMember.findUnique({
+	async removeMember(teamId: string, dto: RemoveMemberDto) {
+		return await this.prisma.teamMember.delete({
 			where: {
-				id: memberId,
+				id: dto.memberId,
 				teamId
-			},
-			include: {
-				role: {
-					select: {
-						rights: true
-					}
-				}
 			}
 		})
 	}
 
-	async removeMember(teamId: string, dto: RemoveMemberDto, userId: string) {
-		if (await this.isCreatorOrMember(teamId, userId)) {
-			return await this.prisma.teamMember.delete({
-				where: {
-					id: dto.memberId,
-					teamId,
-					userId: dto.userId
-				}
-			})
-		}
-	}
-
-	async isCreatorOrMember(teamId: string, userId?: string, memberId?: string) {
+	async isMember(teamId: string, userId: string) {
 		const isMember = await this.prisma.teamMember.findFirst({
 			where: {
-				userId,
 				teamId,
-				id: memberId
+				userId
 			}
 		})
 
-		const isCreator = await this.prisma.team.findFirst({
-			where: {
-				creatorId: userId
-			},
-			select: {
-				creatorId: true
-			}
-		})
-
-		if (isCreator) return { creator: true }
 		if (isMember) return { member: true, memberData: isMember }
 
 		throw new BadRequestException('User is not member of this team')
 	}
 
-	async getTeamRoles(teamId: string, userId: string) {
-		const user = await this.isCreatorOrMember(teamId, userId)
-		if (user.member || user.creator) {
-			return await this.prisma.teamRole.findMany({
-				where: {
-					teamId
-				}
-			})
-		}
+	async getTeamRoles(teamId: string) {
+		return await this.prisma.teamRole.findMany({
+			where: {
+				teamId
+			}
+		})
 	}
 
-	async getTeamDetails(teamId: string, userId: string) {
-		const user = await this.isCreatorOrMember(teamId, userId)
-		if (user.member || user.creator) {
-			return await this.prisma.team.findUnique({
-				where: {
-					id: teamId
-				},
-				include: {
-					members: {
-						include: {
-							role: {
-								select: {
-									id: true,
-									name: true
-								}
-							},
-							user: {
-								select: {
-									id: true,
-									firstName: true,
-									lastName: true,
-									nickname: true,
-									avatarPath: true,
-									email: true
-								}
+	async getTeamDetails(teamId: string) {
+		return await this.prisma.team.findUnique({
+			where: {
+				id: teamId
+			},
+			include: {
+				members: {
+					include: {
+						role: {
+							select: {
+								id: true,
+								name: true
 							}
-						}
-					},
-					creator: {
-						select: {
-							id: true,
-							firstName: true,
-							lastName: true,
-							nickname: true,
-							avatarPath: true,
-							email: true
-						}
-					},
-					projects: {
-						include: {
-							_count: {
-								select: { tasks: true }
+						},
+						user: {
+							select: {
+								id: true,
+								firstName: true,
+								lastName: true,
+								nickname: true,
+								avatarPath: true,
+								email: true
 							}
 						}
 					}
+				},
+				creator: {
+					select: {
+						id: true,
+						firstName: true,
+						lastName: true,
+						nickname: true,
+						avatarPath: true,
+						email: true
+					}
 				}
-			})
-		}
+			}
+		})
 	}
 
 	async findAllUserTeams(userId: string) {
-		const createdByUser = await this.prisma.team.findMany({
-			where: {
-				creatorId: userId
-			},
-			select: {
-				id: true,
-				name: true
-			}
-		})
-
 		const member = await this.prisma.teamMember.findMany({
 			where: {
 				userId
@@ -498,7 +457,6 @@ export class TeamService {
 		}))
 
 		return {
-			createdByUser,
 			member: teams
 		}
 	}

@@ -1,54 +1,57 @@
-import {
-	email,
-	maxValue,
-	minLength,
-	minValue,
-	number,
-	object,
-	optional,
-	string
-} from 'valibot'
+import { z } from "zod"
 
-import type { IProfileResponse, IUser, TypeUserForm } from '@/types/user.types'
+import type { IProfileResponse, IUser, TypeUserForm } from "@/types/user.types"
 
-import HttpFactory from '../factory'
+import HttpFactory from "../factory"
 
 class UserModule extends HttpFactory {
-	private URL = '/user'
+	private URL = "/user"
 
-	settingsValidationSchema = object({
-		email: string('', [
-			minLength(1, 'Email is required'),
-			email('Invalid email')
-		]),
-		password: optional(string('', [minLength(6, 'Password too short')])),
-		nickname: optional(
-			string('', [minLength(3, 'Nickname must be at least 3 chars')])
+	settingsValidationSchema = z.object({
+		email: z
+			.string()
+			.min(1, { message: "Email is required" })
+			.email({ message: "Invalid email" }),
+		password: z.nullable(
+			z.optional(z.string().min(6, { message: "Password too short" }))
 		),
-		firstName: optional(
-			string('', [minLength(3, 'First name must be at least 3 chars')])
+		nickname: z.nullable(
+			z.optional(
+				z.string().min(3, { message: "Nickname must be at least 3 chars" })
+			)
 		),
-		lastName: optional(
-			string('', [minLength(3, 'Last name must be at least 3 chars')])
+		firstName: z.nullable(
+			z.optional(
+				z.string().min(3, { message: "First name must be at least 3 chars" })
+			)
 		),
-		breakInterval: optional(number('', [minValue(1, 'Min interval is 1')])),
-		intervalsCount: optional(
-			number('', [
-				minValue(1, 'Min intervals is 1'),
-				maxValue(10, 'Max intervals is 10')
-			])
+		lastName: z.nullable(
+			z.optional(
+				z.string().min(3, { message: "Last name must be at least 3 chars" })
+			)
 		),
-		workInterval: optional(number('', [minValue(1, 'Min interval is 1')]))
+		breakInterval: z.optional(
+			z.number().min(1, { message: "Min interval must be at least 1" })
+		),
+		workInterval: z.optional(
+			z.number().min(1, { message: "Min interval must be at least 1" })
+		),
+		intervalsCount: z.optional(
+			z
+				.number()
+				.min(1, { message: "Min intervals must be at least 1" })
+				.max(10, { message: "Max intervals is 10" })
+		)
 	})
 
 	async getProfile(): Promise<IProfileResponse> {
-		const res = await this.call<IProfileResponse>('GET', `${this.URL}/profile`)
+		const res = await this.call<IProfileResponse>("GET", `${this.URL}/profile`)
 
 		return res
 	}
 
 	async update(data: TypeUserForm) {
-		const res = await this.call<IUser>('PUT', `${this.URL}/update`, data)
+		const res = await this.call<IUser>("PUT", `${this.URL}/update`, data)
 
 		return res
 	}

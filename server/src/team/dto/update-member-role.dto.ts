@@ -7,10 +7,6 @@ export class SetMemberRoleDto {
 
 	@IsString()
 	@IsNotEmpty()
-	teamId: string
-
-	@IsString()
-	@IsNotEmpty()
 	roleId: string
 }
 
@@ -18,10 +14,6 @@ export class UpdateMemberRoleDto {
 	@IsString()
 	@IsNotEmpty()
 	memberId: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 
 	@IsString()
 	@IsNotEmpty()
