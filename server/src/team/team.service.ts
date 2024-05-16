@@ -67,20 +67,40 @@ export class TeamService {
 			}
 		})
 
-		await this.prisma.userActiveTeamMember.create({
-			data: {
-				user: {
-					connect: {
-						id: userId
-					}
-				},
-				activeTeamMember: {
-					connect: {
-						id: teamMember.id
-					}
-				}
+		const active = await this.prisma.userActiveTeamMember.findFirst({
+			where: {
+				userId
 			}
 		})
+
+		if (active) {
+			await this.prisma.userActiveTeamMember.update({
+				where: {
+					userId
+				},
+				data: {
+					activeTeamMember: {
+						connect: {
+							id: teamMember.id
+						}
+					}
+				}
+			})
+		} else
+			await this.prisma.userActiveTeamMember.create({
+				data: {
+					user: {
+						connect: {
+							id: userId
+						}
+					},
+					activeTeamMember: {
+						connect: {
+							id: teamMember.id
+						}
+					}
+				}
+			})
 
 		return team
 	}
@@ -98,11 +118,21 @@ export class TeamService {
 				}
 			})
 
-			await this.prisma.userActiveTeamMember.delete({
+			const oldActivity = await this.prisma.userActiveTeamMember.findFirst({
 				where: {
 					userId
+				},
+				select: {
+					id: true
 				}
 			})
+
+			if (oldActivity)
+				await this.prisma.userActiveTeamMember.delete({
+					where: {
+						id: oldActivity.id
+					}
+				})
 
 			const data = await this.prisma.userActiveTeamMember.create({
 				data: {
@@ -136,6 +166,7 @@ export class TeamService {
 					}
 				}
 			})
+
 			return {
 				activeTeamId: data.activeTeamMember.teamId,
 				activeRole: {

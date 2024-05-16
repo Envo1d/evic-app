@@ -120,7 +120,7 @@ export class ProjectController {
 	@UsePipes(new ValidationPipe())
 	updateListTitle(
 		@Body() dto: UpdateListTitleDto,
-		@Param('id') projectId: string,
+		@Param('projectId') projectId: string,
 		@CurrentTeam() teamId: string
 	) {
 		return this.projectService.updateListTitle(projectId, dto, teamId)
@@ -132,7 +132,7 @@ export class ProjectController {
 	@UsePipes(new ValidationPipe())
 	updateListOrder(
 		@Body() dto: UpdateListOrderDto,
-		@Param('id') projectId: string,
+		@Param('projectId') projectId: string,
 		@CurrentTeam() teamId: string
 	) {
 		return this.projectService.updateListOrder(projectId, dto, teamId)
@@ -144,7 +144,7 @@ export class ProjectController {
 	@UsePipes(new ValidationPipe())
 	deleteList(
 		@Body() dto: DeleteListDto,
-		@Param('id') projectId: string,
+		@Param('projectId') projectId: string,
 		@CurrentTeam() teamId: string
 	) {
 		return this.projectService.deleteList(projectId, dto, teamId)
