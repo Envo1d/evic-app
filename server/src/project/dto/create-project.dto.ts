@@ -11,9 +11,5 @@ export class CreateProjectDto {
 
 	@IsString()
 	@IsNotEmpty()
-	teamId: string
-
-	@IsString()
-	@IsNotEmpty()
 	imagePath: string
 }

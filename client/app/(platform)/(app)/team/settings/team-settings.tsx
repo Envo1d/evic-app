@@ -37,30 +37,38 @@ export function TeamSettings() {
 						<div className="flex flex-col pt-6 px-8 ">
 							<div className="flex flex-row gap-1 items-center w-full mb-5">
 								<UsersRound
-									className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 border text-white"
+									className="hidden md:block bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 border text-white"
 									size={35}
 								/>
-								<p className="font-semibold truncate ml-3">{data?.name}</p>
+								<p className="hidden md:block font-semibold truncate ml-3">
+									{data?.name}
+								</p>
 							</div>
 							<Button
 								variant="ghost"
 								className={cn(
-									"mb-3 flex justify-start text-primary/70 transition-all",
+									"mb-3 flex justify-center items-center text-primary/70 transition-all",
 									isMembersTab && "text-primary border"
 								)}
 								onClick={() => setIsMembersTab(true)}
 							>
-								<User className="mr-2 h-4 w-4" /> Members
+								<div className="flex flex-row gap-x-2">
+									<User className="h-4 w-4" />
+									<p className="hidden md:block">Members</p>
+								</div>
 							</Button>
 							<Button
 								className={cn(
-									"flex justify-start text-primary/70 transition-all",
+									"flex justify-center items-center text-primary/70 transition-all",
 									!isMembersTab && "text-primary border"
 								)}
 								variant="ghost"
 								onClick={() => setIsMembersTab(false)}
 							>
-								<Settings className="mr-2 h-4 w-4" /> Settings
+								<div className="flex flex-row gap-x-2">
+									<Settings className="h-4 w-4" />
+									<p className="hidden md:block">Settings</p>
+								</div>
 							</Button>
 						</div>
 					</ResizablePanel>

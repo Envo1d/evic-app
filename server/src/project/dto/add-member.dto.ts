@@ -8,8 +8,4 @@ export class AddProjectMemberDto {
 	@IsString()
 	@IsNotEmpty()
 	projectId: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 }

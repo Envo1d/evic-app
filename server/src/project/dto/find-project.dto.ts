@@ -4,8 +4,4 @@ export class FindProjectDto {
 	@IsString()
 	@IsNotEmpty()
 	projectId: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 }

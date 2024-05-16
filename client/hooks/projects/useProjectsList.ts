@@ -13,7 +13,7 @@ export function useProjectsList() {
 
 	const { data, isLoading, isSuccess, refetch } = useQuery({
 		queryKey: ["projects", activeTeam?.activeTeamId],
-		queryFn: () => api.project.getAllProjects(activeTeam?.activeTeamId!),
+		queryFn: () => api.project.getAllProjects(),
 		enabled: !isActiveLoading && isActiveSuccess
 	})
 

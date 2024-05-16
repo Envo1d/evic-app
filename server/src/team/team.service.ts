@@ -184,6 +184,34 @@ export class TeamService {
 		}
 	}
 
+	async checkProjectTeam(
+		teamId: string,
+		teamMemberId: string,
+		projectId: string
+	) {
+		const project = await this.prisma.project.findUnique({
+			where: {
+				id: projectId,
+				teamId
+			},
+			select: {
+				id: true,
+				members: {
+					select: {
+						id: true
+					}
+				}
+			}
+		})
+
+		if (!project) throw new BadRequestException('Project not found')
+
+		const membersIds = project.members.map(item => item.id)
+
+		if (!membersIds.includes(teamMemberId))
+			throw new BadRequestException('You are not member of this project')
+	}
+
 	async createRole(dto: CreateTeamRoleDto, teamId: string) {
 		return await this.prisma.teamRole.create({
 			data: {

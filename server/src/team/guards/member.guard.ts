@@ -27,6 +27,7 @@ export class MemberGuard implements CanActivate {
 		if (activeTeamMember.activeTeamId === request.cookies.team_id) {
 			request.teamId = request.cookies.team_id
 			request.rights = activeTeamMember.activeRole.rights
+			request.teamMemberId = activeTeamMember.activeTeamMemberId
 			return true
 		} else throw new ForbiddenException('You are not a member of this team')
 	}

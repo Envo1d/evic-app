@@ -36,27 +36,16 @@ export interface IProjectMemberResponse extends IBase {
 
 export interface IProjectCreateForm {
 	name: string
-	teamId: string
 	teamMemberId: string
 	imagePath: string
 }
 
 export interface IFindProjectForm {
 	projectId: string
-	teamId: string
-}
-
-export interface IFindProjectsForm {
-	teamId: string
-}
-
-export interface IDeleteProjectForm {
-	teamId: string
 }
 
 export interface IProjectUpdateForm {
 	name: string
-	teamId: string
 }
 
 export interface IProjectAddMemberForm {
@@ -67,5 +56,26 @@ export interface IProjectAddMemberForm {
 export interface IProjectRemoveMemberForm {
 	projectMemberId: string
 	projectId: string
-	teamId: string
+}
+
+export interface ICreateListForm {
+	title: string
+}
+
+export interface IUpdateListTitleForm {
+	title: string
+	listId: string
+}
+
+export interface ICopyListForm {
+	listId: string
+}
+
+export interface IUpdateListOrderForm {
+	oder: number
+	listId: string
+}
+
+export interface IDeleteListForm {
+	listId: string
 }
