@@ -256,7 +256,7 @@ export class ProjectService {
 		if (!listToCopy) throw new BadRequestException('List not found!')
 
 		const lastList = await this.prisma.list.findFirst({
-			where: { projectId, project: { teamId } },
+			where: { projectId: project.id },
 			orderBy: { order: 'desc' },
 			select: { order: true }
 		})
@@ -300,12 +300,11 @@ export class ProjectService {
 		dto: UpdateListTitleDto,
 		teamId: string
 	) {
-		const project = await this.checkProject(projectId, teamId)
+		const list = await this.checkList(dto.listId, projectId, teamId)
 
 		return await this.prisma.list.update({
 			where: {
-				projectId: project.id,
-				id: dto.listId
+				id: list.id
 			},
 			data: {
 				title: dto.title
@@ -318,12 +317,11 @@ export class ProjectService {
 		dto: UpdateListOrderDto,
 		teamId: string
 	) {
-		const project = await this.checkProject(projectId, teamId)
+		const list = await this.checkList(dto.listId, projectId, teamId)
 
 		return await this.prisma.list.update({
 			where: {
-				projectId: project.id,
-				id: dto.listId
+				id: list.id
 			},
 			data: {
 				order: dto.order
@@ -332,18 +330,17 @@ export class ProjectService {
 	}
 
 	async deleteList(projectId: string, dto: DeleteListDto, teamId: string) {
-		const project = await this.checkProject(projectId, teamId)
+		const list = await this.checkList(dto.listId, projectId, teamId)
 
 		return await this.prisma.list.delete({
 			where: {
-				projectId: project.id,
-				id: dto.listId
+				id: list.id
 			}
 		})
 	}
 
 	async checkProject(projectId: string, teamId: string) {
-		const project = await this.prisma.project.findFirst({
+		const project = await this.prisma.project.findUnique({
 			where: {
 				id: projectId,
 				teamId
@@ -358,10 +355,10 @@ export class ProjectService {
 		return project
 	}
 
-	async checkList(listId, projectId, teamId) {
+	async checkList(listId: string, projectId: string, teamId: string) {
 		const project = await this.checkProject(projectId, teamId)
 
-		const list = await this.prisma.list.findFirst({
+		const list = await this.prisma.list.findUnique({
 			where: {
 				id: listId,
 				projectId: project.id
@@ -371,7 +368,7 @@ export class ProjectService {
 			}
 		})
 
-		if (!list) throw new BadRequestException('Project not found')
+		if (!list) throw new BadRequestException('List not found')
 
 		return list
 	}
