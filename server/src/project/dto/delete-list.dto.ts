@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class RemoveProjectDto {
+export class DeleteListDto {
 	@IsString()
 	@IsNotEmpty()
-	teamId: string
+	listId: string
 }

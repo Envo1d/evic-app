@@ -3,12 +3,9 @@ import { useRouter } from "next/navigation"
 import { FetchError } from "ofetch"
 import { toast } from "sonner"
 
-import { useGetActiveTeam } from "../teams"
-
 import api from "@/api"
 
 export function useDeleteProject() {
-	const { data } = useGetActiveTeam()
 	const { push } = useRouter()
 	const queryClient = useQueryClient()
 
@@ -18,8 +15,7 @@ export function useDeleteProject() {
 		isError
 	} = useMutation({
 		mutationKey: ["delete project"],
-		mutationFn: (id: string) =>
-			api.project.deleteProject(id, { teamId: data?.activeTeamId! }),
+		mutationFn: (id: string) => api.project.deleteProject(id),
 		onSuccess() {
 			queryClient.invalidateQueries({ queryKey: ["projects"] })
 			toast.success("Board deleted")

@@ -4,8 +4,4 @@ export class UpdateProjectDto {
 	@IsString()
 	@IsNotEmpty()
 	name: string
-
-	@IsString()
-	@IsNotEmpty()
-	teamId: string
 }

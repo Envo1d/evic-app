@@ -41,7 +41,6 @@ export function BoardList() {
 				<FormPopover
 					sideOffset={10}
 					side="right"
-					teamId={team?.activeTeamId!}
 					teamMemberId={team?.activeTeamMemberId!}
 				>
 					<div

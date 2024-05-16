@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class AddProjectMemberDto {
+export class UpdateListTitleDto {
 	@IsString()
 	@IsNotEmpty()
-	teamMemberId: string
+	listId: string
 
 	@IsString()
 	@IsNotEmpty()
-	projectId: string
+	title: string
 }

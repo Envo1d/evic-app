@@ -5,6 +5,7 @@ import { Loader } from "lucide-react"
 import { useProjectDetails } from "@/hooks/projects"
 
 import { BoardNavbar } from "./_components/board-navbar"
+import { ListContainer } from "./_components/list-container"
 
 interface IBoard {
 	projectId: string
@@ -27,7 +28,14 @@ export function Board({ projectId }: IBoard) {
 		>
 			<BoardNavbar id={projectId} />
 			<div className="absolute inset-0 bg-black/10" />
-			<div className="relative pt-28 h-full">{project?.name}</div>
+			<div className="relative pt-28 h-full">
+				<div className="p-4 h-full overflow-x-auto">
+					<ListContainer
+						projectId={projectId}
+						lists={project?.lists!}
+					/>
+				</div>
+			</div>
 		</div>
 	)
 }

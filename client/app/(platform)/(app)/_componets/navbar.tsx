@@ -26,7 +26,6 @@ export function Navbar() {
 					align="start"
 					side="bottom"
 					sideOffset={18}
-					teamId={data?.activeTeamId!}
 					teamMemberId={data?.activeTeamMemberId!}
 				>
 					<Button
@@ -41,7 +40,6 @@ export function Navbar() {
 					align="start"
 					side="bottom"
 					sideOffset={18}
-					teamId={data?.activeTeamId!}
 					teamMemberId={data?.activeTeamMemberId!}
 				>
 					<Button

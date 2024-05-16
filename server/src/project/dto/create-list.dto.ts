@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class FindProjectDto {
+export class CreateListDto {
 	@IsString()
 	@IsNotEmpty()
-	projectId: string
+	title: string
 }

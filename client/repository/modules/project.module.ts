@@ -1,13 +1,18 @@
 import { z } from "zod"
 
 import {
-	IDeleteProjectForm,
+	ICopyListForm,
+	ICreateListForm,
+	IDeleteListForm,
 	IProjectAddMemberForm,
 	IProjectCreateForm,
+	IProjectListResponse,
 	IProjectMemberResponse,
 	IProjectRemoveMemberForm,
 	IProjectResponse,
-	IProjectUpdateForm
+	IProjectUpdateForm,
+	IUpdateListOrderForm,
+	IUpdateListTitleForm
 } from "@/types/project.types"
 
 import HttpFactory from "../factory"
@@ -21,8 +26,15 @@ class ProjectModule extends HttpFactory {
 			.min(3, { message: "Minimum length of 3 letters is required" }),
 		imagePath: z.string().min(1, { message: "Image not selected" })
 	})
+
 	updateValidationSchema = z.object({
 		name: z
+			.string()
+			.min(3, { message: "Minimum length of 3 letters is required" })
+	})
+
+	listValidationSchema = z.object({
+		title: z
 			.string()
 			.min(3, { message: "Minimum length of 3 letters is required" })
 	})
@@ -45,10 +57,10 @@ class ProjectModule extends HttpFactory {
 		return res
 	}
 
-	async getAllProjects(teamId: string): Promise<IProjectResponse[]> {
+	async getAllProjects(): Promise<IProjectResponse[]> {
 		const res = await this.call<IProjectResponse[]>(
 			"GET",
-			`${this.URL}/by-team/${teamId}`
+			`${this.URL}/by-team`
 		)
 
 		return res
@@ -76,14 +88,10 @@ class ProjectModule extends HttpFactory {
 		return res
 	}
 
-	async deleteProject(
-		id: string,
-		data: IDeleteProjectForm
-	): Promise<IProjectResponse> {
+	async deleteProject(id: string): Promise<IProjectResponse> {
 		const res = await this.call<IProjectResponse>(
 			"PUT",
-			`${this.URL}/delete/${id}`,
-			data
+			`${this.URL}/delete/${id}`
 		)
 
 		return res
@@ -95,6 +103,71 @@ class ProjectModule extends HttpFactory {
 		const res = await this.call<IProjectResponse>(
 			"PUT",
 			`${this.URL}/delete-member`,
+			data
+		)
+
+		return res
+	}
+
+	async createList(
+		projectId: string,
+		data: ICreateListForm
+	): Promise<IProjectListResponse> {
+		const res = await this.call<IProjectListResponse>(
+			"POST",
+			`${this.URL}/${projectId}`,
+			data
+		)
+
+		return res
+	}
+
+	async copyList(
+		projectId: string,
+		data: ICopyListForm
+	): Promise<IProjectListResponse> {
+		const res = await this.call<IProjectListResponse>(
+			"POST",
+			`${this.URL}/copy-list/${projectId}`,
+			data
+		)
+
+		return res
+	}
+
+	async updateListTitle(
+		projectId: string,
+		data: IUpdateListTitleForm
+	): Promise<IProjectListResponse> {
+		const res = await this.call<IProjectListResponse>(
+			"PATCH",
+			`${this.URL}/list-title/${projectId}`,
+			data
+		)
+
+		return res
+	}
+
+	async updateListOrder(
+		projectId: string,
+		data: IUpdateListOrderForm
+	): Promise<IProjectListResponse> {
+		const res = await this.call<IProjectListResponse>(
+			"PATCH",
+			`${this.URL}/list-order/${projectId}`,
+			data
+		)
+
+		return res
+	}
+
+	async deleteList(
+		projectId: string,
+		data: IDeleteListForm
+	): Promise<IProjectListResponse> {
+		const res = await this.call<IProjectListResponse>(
+			"PUT",
+			`${this.URL}/delete-list/${projectId}`,
 			data
 		)
 

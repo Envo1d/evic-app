@@ -1,13 +1,12 @@
 import type { Metadata } from "next"
-import { Nunito_Sans } from "next/font/google"
+import { Inter } from "next/font/google"
 
 import { siteConfig } from "@/config/site"
 
 import "./globals.scss"
 
-const lato = Nunito_Sans({
-	subsets: ["latin"],
-	weight: ["200", "1000", "300", "400", "500", "600", "700", "800", "900"]
+const inter = Inter({
+	subsets: ["latin"]
 })
 
 export const metadata: Metadata = {
@@ -31,7 +30,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={lato.className}>{children}</body>
+			<body className={inter.className}>{children}</body>
 		</html>
 	)
 }
