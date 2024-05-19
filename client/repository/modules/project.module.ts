@@ -11,8 +11,8 @@ import {
 	IProjectRemoveMemberForm,
 	IProjectResponse,
 	IProjectUpdateForm,
-	IUpdateListOrderForm,
-	IUpdateListTitleForm
+	IUpdateListTitleForm,
+	IUpdateListsOrderForm
 } from "@/types/project.types"
 
 import HttpFactory from "../factory"
@@ -148,11 +148,11 @@ class ProjectModule extends HttpFactory {
 		return res
 	}
 
-	async updateListOrder(
+	async updateListsOrder(
 		projectId: string,
-		data: IUpdateListOrderForm
-	): Promise<IProjectListResponse> {
-		const res = await this.call<IProjectListResponse>(
+		data: IUpdateListsOrderForm
+	): Promise<IProjectListResponse[]> {
+		const res = await this.call<IProjectListResponse[]>(
 			"PATCH",
 			`${this.URL}/list-order/${projectId}`,
 			data

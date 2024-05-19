@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class CreateProjectDto {
+export class CreateTaskDto {
 	@IsString()
 	@IsNotEmpty()
 	name: string
 
 	@IsString()
 	@IsNotEmpty()
-	imagePath: string
+	listId: string
 }

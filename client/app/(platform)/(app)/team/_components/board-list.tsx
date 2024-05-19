@@ -7,11 +7,9 @@ import { FormPopover } from "@/components/form-popover"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useProjectsList } from "@/hooks/projects"
-import { useGetActiveTeam } from "@/hooks/teams"
 
 export function BoardList() {
-	const { data: team } = useGetActiveTeam()
-	const { data: projects, isLoading } = useProjectsList()
+	const { data: projects } = useProjectsList()
 
 	return (
 		<div className="space-y-4">
@@ -41,7 +39,6 @@ export function BoardList() {
 				<FormPopover
 					sideOffset={10}
 					side="right"
-					teamMemberId={team?.activeTeamMemberId!}
 				>
 					<div
 						role="button"

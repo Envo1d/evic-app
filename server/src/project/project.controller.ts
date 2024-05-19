@@ -18,9 +18,10 @@ import { CreateProjectDto } from './dto/create-project.dto'
 import { DeleteListDto } from './dto/delete-list.dto'
 import { RemoveProjectMemberDto } from './dto/remove-member.dto'
 
+import { CurrentTeamMember } from 'src/team/decorators/team-member.decorator'
 import { CopyListDto } from './dto/copy-list.dto'
-import { UpdateListOrderDto } from './dto/update-list-order.dto'
 import { UpdateListTitleDto } from './dto/update-list-title.dto'
+import { UpdateListsOrderDto } from './dto/update-lists-order.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectService } from './project.service'
 
@@ -32,8 +33,12 @@ export class ProjectController {
 	@HttpCode(200)
 	@AuthTeamMember(['create_project'])
 	@UsePipes(new ValidationPipe())
-	create(@Body() dto: CreateProjectDto, @CurrentTeam() teamId: string) {
-		return this.projectService.create(dto, teamId)
+	create(
+		@Body() dto: CreateProjectDto,
+		@CurrentTeam() teamId: string,
+		@CurrentTeamMember() teamMemberId: string
+	) {
+		return this.projectService.create(dto, teamId, teamMemberId)
 	}
 
 	@Post('add-member')
@@ -131,7 +136,7 @@ export class ProjectController {
 	@AuthTeamMember(['edit_task'])
 	@UsePipes(new ValidationPipe())
 	updateListOrder(
-		@Body() dto: UpdateListOrderDto,
+		@Body() dto: UpdateListsOrderDto,
 		@Param('projectId') projectId: string,
 		@CurrentTeam() teamId: string
 	) {

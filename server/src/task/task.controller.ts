@@ -1,50 +1,83 @@
 import {
 	Body,
 	Controller,
-	Delete,
-	Get,
 	HttpCode,
 	Param,
+	Patch,
 	Post,
 	Put,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { Auth } from '../auth/decorators/auth.decorator'
-import { CurrentUser } from '../auth/decorators/user.decorator'
-import { TaskDto } from './dto/task.dto'
+import { AuthTeamMember } from '../team/decorators/auth-team-member.decorator'
+import { CurrentTeam } from '../team/decorators/team.decorator'
+import { CreateTaskDto } from './dto/create-task.dto'
+import { DeleteTaskDto } from './dto/delete-task.dto'
+import { UpdateDescriptionDto } from './dto/update-description.dto'
+import { UpdateNameDto } from './dto/update-name.dto'
+import { UpdateOrderDto } from './dto/update-order'
 import { TaskService } from './task.service'
 
 @Controller('tasks')
 export class TaskController {
 	constructor(private readonly taskService: TaskService) {}
 
-	@Get()
-	@Auth()
-	async getAll(@CurrentUser('id') userId: string) {
-		return this.taskService.getAll(userId)
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Post(':projectId')
+	@AuthTeamMember(['create_task'])
+	async create(
+		@Body() dto: CreateTaskDto,
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string
+	) {
+		return this.taskService.create(projectId, teamId, dto)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Post()
-	@Auth()
-	async create(@Body() dto: TaskDto, @CurrentUser('id') userId: string) {
-		return this.taskService.create(dto, userId)
+	@Patch('update-name/:projectId')
+	@AuthTeamMember(['edit_task'])
+	async updateName(
+		@Body() dto: UpdateNameDto,
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string
+	) {
+		return this.taskService.updateName(projectId, teamId, dto)
 	}
 
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
-	@Put(':id')
-	@Auth()
-	async update(@Body() dto: TaskDto, @Param('id') id: string) {
-		return this.taskService.update(dto, id)
+	@Patch('update-description/:projectId')
+	@AuthTeamMember(['edit_task'])
+	async updateDescription(
+		@Body() dto: UpdateDescriptionDto,
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string
+	) {
+		return this.taskService.updateDescription(projectId, teamId, dto)
+	}
+
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	@Patch('update-order-list/:projectId')
+	@AuthTeamMember(['edit_task'])
+	async updateOrderOnList(
+		@Body() dto: UpdateOrderDto,
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string
+	) {
+		return this.taskService.updateOrderOnList(projectId, teamId, dto)
 	}
 
 	@HttpCode(200)
-	@Delete(':id')
-	@Auth()
-	async delete(@Param('id') id: string) {
-		return this.taskService.delete(id)
+	@Put(':projectId')
+	@AuthTeamMember(['delete_task'])
+	async delete(
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string,
+		@Body() dto: DeleteTaskDto
+	) {
+		return this.taskService.delete(projectId, teamId, dto)
 	}
 }

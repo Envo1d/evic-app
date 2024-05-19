@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronsUpDown, UsersRound } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useGetActiveTeam, useSetActiveTeam } from "@/hooks/teams"
@@ -21,7 +22,8 @@ import { cn } from "@/lib/utils"
 
 export function TeamSelector() {
 	const { data: teams, isLoading } = useTeamList()
-
+	const { push } = useRouter()
+	const pathname = usePathname()
 	const { setActiveTeam } = useSetActiveTeam()
 	const { data, isLoading: isActiveTeamLoading } = useGetActiveTeam()
 
@@ -56,7 +58,7 @@ export function TeamSelector() {
 					className="w-[200px] justify-between h-1/3 border-none"
 				>
 					{value !== "0" ? (
-						<div className="flex flex-row gap-1 items-center w-full">
+						<div className="flex flex-row gap-1 items-center w-5/6">
 							<UsersRound
 								className="bg-gradient-to-tr from-violet-500 to-blue-500 rounded-md p-1 border text-white"
 								size={35}
@@ -85,6 +87,7 @@ export function TeamSelector() {
 										onSelect={currentValue => {
 											setValue(currentValue)
 											setOpen(false)
+											if (!pathname.includes("/team")) push("/team")
 										}}
 									>
 										<div

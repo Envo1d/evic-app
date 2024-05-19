@@ -25,9 +25,10 @@ import api from "@/api"
 
 interface IListHeader {
 	data: IProjectListResponse
+	onAddCard: () => void
 }
 
-export function ListHeader({ data }: IListHeader) {
+export function ListHeader({ data, onAddCard }: IListHeader) {
 	const [isEditing, setIsEditing] = useState(false)
 	const formRef = useRef<ElementRef<"form">>(null)
 	const inputRef = useRef<ElementRef<"input">>(null)
@@ -110,7 +111,7 @@ export function ListHeader({ data }: IListHeader) {
 				</div>
 			)}
 			<ListOptions
-				onAddCard={() => {}}
+				onAddCard={onAddCard}
 				data={data}
 			/>
 		</div>

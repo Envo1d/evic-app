@@ -32,7 +32,7 @@ export function Board({ projectId }: IBoard) {
 				<div className="p-4 h-full overflow-x-auto">
 					<ListContainer
 						projectId={projectId}
-						lists={project?.lists!}
+						lists={project?.lists || []}
 					/>
 				</div>
 			</div>

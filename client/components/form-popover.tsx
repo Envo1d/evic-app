@@ -35,15 +35,13 @@ interface IFormPopover {
 	side?: "left" | "right" | "top" | "bottom"
 	align?: "start" | "center" | "end"
 	sideOffset?: number
-	teamMemberId: string
 }
 
 export function FormPopover({
 	children,
 	side = "bottom",
 	align,
-	sideOffset = 0,
-	teamMemberId
+	sideOffset = 0
 }: IFormPopover) {
 	const [isOpen, setIsOpen] = useState(false)
 
@@ -59,7 +57,6 @@ export function FormPopover({
 	const { mutate, isPending } = useCreateProject()
 
 	const onSubmit: SubmitHandler<IProjectCreateForm> = data => {
-		data.teamMemberId = teamMemberId
 		mutate(data)
 		form.reset()
 		setIsOpen(false)
