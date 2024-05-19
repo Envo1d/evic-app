@@ -7,9 +7,5 @@ export class CreateProjectDto {
 
 	@IsString()
 	@IsNotEmpty()
-	teamMemberId: string
-
-	@IsString()
-	@IsNotEmpty()
 	imagePath: string
 }

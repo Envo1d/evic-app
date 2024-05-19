@@ -7,6 +7,7 @@ import { ProjectService } from './project.service'
 
 @Module({
 	controllers: [ProjectController],
-	providers: [ProjectService, PrismaService, TeamService, UserService]
+	providers: [ProjectService, PrismaService, TeamService, UserService],
+	exports: [ProjectService]
 })
 export class ProjectModule {}

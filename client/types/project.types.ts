@@ -36,7 +36,6 @@ export interface IProjectMemberResponse extends IBase {
 
 export interface IProjectCreateForm {
 	name: string
-	teamMemberId: string
 	imagePath: string
 }
 
@@ -71,9 +70,8 @@ export interface ICopyListForm {
 	listId: string
 }
 
-export interface IUpdateListOrderForm {
-	oder: number
-	listId: string
+export interface IUpdateListsOrderForm {
+	ids: string[]
 }
 
 export interface IDeleteListForm {

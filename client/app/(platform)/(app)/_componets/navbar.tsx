@@ -8,13 +8,9 @@ import { Profile } from "@/components/profile"
 import { TeamSelector } from "@/components/team-selector"
 import { Button } from "@/components/ui/button"
 
-import { useGetActiveTeam } from "@/hooks/teams"
-
 import { MobileSidebar } from "../team/_components/mobile-sidebar"
 
 export function Navbar() {
-	const { data } = useGetActiveTeam()
-
 	return (
 		<nav className="fixed z-50 top-0 px-4 w-full h-14 border-b shadow-sm bg-white flex items-center">
 			<MobileSidebar />
@@ -26,7 +22,6 @@ export function Navbar() {
 					align="start"
 					side="bottom"
 					sideOffset={18}
-					teamMemberId={data?.activeTeamMemberId!}
 				>
 					<Button
 						variant="primary"
@@ -40,7 +35,6 @@ export function Navbar() {
 					align="start"
 					side="bottom"
 					sideOffset={18}
-					teamMemberId={data?.activeTeamMemberId!}
 				>
 					<Button
 						variant="primary"

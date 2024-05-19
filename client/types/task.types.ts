@@ -1,7 +1,6 @@
 import { ICommentResponse } from "./comment.types"
-import { IProjectListResponse } from "./project.types"
+import { IProjectListResponse, IProjectMemberResponse } from "./project.types"
 import type { IBase } from "./root.types"
-import { IUser } from "./user.types"
 
 export enum EnumTaskPriority {
 	low = "low",
@@ -10,8 +9,8 @@ export enum EnumTaskPriority {
 }
 
 export interface ITaskExecutorResponse extends IBase {
-	task: ITaskResponse
-	user: IUser
+	task?: ITaskResponse
+	user?: IProjectMemberResponse
 }
 
 export interface ITaskResponse extends IBase {
@@ -20,8 +19,8 @@ export interface ITaskResponse extends IBase {
 	order: number
 	status?: boolean
 	description?: string
-	imagePath: string
-	deadline: string
+	imagePath?: string
+	deadline?: string
 	color?: string
 	comments?: ICommentResponse[]
 	taskExecutor?: ITaskExecutorResponse
@@ -30,3 +29,33 @@ export interface ITaskResponse extends IBase {
 }
 
 export type TypeTaskFormState = Partial<Omit<ITaskResponse, "id" | "updatedAt">>
+
+export interface ICreateTask {
+	name: string
+	listId: string
+}
+
+export interface IUpdateTaskName {
+	name: string
+	listId: string
+	taskId: string
+}
+
+export interface IUpdateTaskDescription {
+	description: string
+	listId: string
+	taskId: string
+}
+
+export interface IDeleteTask {
+	listId: string
+	taskId: string
+}
+
+export interface IUpdateTasksOrderOnList {
+	tasks: {
+		id: string
+		listId: string
+		order: number
+	}[]
+}
