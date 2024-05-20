@@ -2,23 +2,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { FetchError } from "ofetch"
 import { toast } from "sonner"
 
-import { IUpdateTasksOrderOnList } from "@/types/task.types"
+import { IUpdateTaskName } from "@/types/task.types"
 
 import api from "@/api"
 
-export function useUpdateOrderOnList(projectId: string) {
+export function useUpdateTaskTitle(projectId: string, taskId: string) {
 	const queryClient = useQueryClient()
 
 	const {
-		mutate: updateTasksOrderOnList,
+		mutate: updateTaskTitle,
 		isSuccess,
 		isError
 	} = useMutation({
-		mutationKey: ["update task order"],
-		mutationFn: (data: IUpdateTasksOrderOnList) =>
-			api.task.updateTaskOrderOnList(projectId, data),
+		mutationKey: ["update card title"],
+		mutationFn: (data: IUpdateTaskName) =>
+			api.task.updateTaskName(projectId, data),
 		onSuccess() {
-			toast.success("Cards order updated")
+			toast.success("Card title updated")
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId]
+			})
 			queryClient.invalidateQueries({
 				queryKey: ["project", projectId]
 			})
@@ -28,5 +31,5 @@ export function useUpdateOrderOnList(projectId: string) {
 		}
 	})
 
-	return { updateTasksOrderOnList, isSuccess, isError }
+	return { updateTaskTitle, isSuccess, isError }
 }

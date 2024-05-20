@@ -14,7 +14,7 @@ export function useUpdateProjectListsOrder(projectId: string) {
 		isSuccess,
 		isError
 	} = useMutation({
-		mutationKey: ["update list title"],
+		mutationKey: ["update list order"],
 		mutationFn: (data: IUpdateListsOrderForm) =>
 			api.project.updateListsOrder(projectId, data),
 		onSuccess() {

@@ -59,3 +59,8 @@ export interface IUpdateTasksOrderOnList {
 		order: number
 	}[]
 }
+
+export interface ICopyTaskForm {
+	taskId: string
+	listId: string
+}

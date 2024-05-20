@@ -193,7 +193,7 @@ export function Profile() {
 						</DropdownMenuContent>
 					</DropdownMenu>
 					{/*  */}
-					<DialogContent>
+					<DialogContent onOpenAutoFocus={e => e.preventDefault()}>
 						<DialogHeader>
 							<DialogTitle>Profile Settings</DialogTitle>
 						</DialogHeader>

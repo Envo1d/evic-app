@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
 	Param,
 	Patch,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/common'
 import { AuthTeamMember } from '../team/decorators/auth-team-member.decorator'
 import { CurrentTeam } from '../team/decorators/team.decorator'
+import { CopyTaskDto } from './dto/copy-task.dto'
 import { CreateTaskDto } from './dto/create-task.dto'
 import { DeleteTaskDto } from './dto/delete-task.dto'
 import { UpdateDescriptionDto } from './dto/update-description.dto'
@@ -68,6 +70,26 @@ export class TaskController {
 		@CurrentTeam() teamId: string
 	) {
 		return this.taskService.updateOrderOnList(projectId, teamId, dto)
+	}
+
+	@Get(':taskId')
+	@AuthTeamMember()
+	async getById(
+		@Param('taskId') taskId: string,
+		@CurrentTeam() teamId: string
+	) {
+		return this.taskService.findById(taskId, teamId)
+	}
+
+	@HttpCode(200)
+	@Put('/copy/:projectId')
+	@AuthTeamMember(['create_task', 'edit_task'])
+	async copy(
+		@Param('projectId') projectId: string,
+		@CurrentTeam() teamId: string,
+		@Body() dto: CopyTaskDto
+	) {
+		return this.taskService.copyTask(projectId, teamId, dto)
 	}
 
 	@HttpCode(200)
