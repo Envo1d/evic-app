@@ -1,2 +1,6 @@
 export * from "./useCreateTask"
 export * from "./useDeleteTask"
+export * from "./useTask"
+export * from "./useUpdateOrderOnList"
+export * from "./useUpdateTaskDescription"
+export * from "./useUpdateTaskTitle"

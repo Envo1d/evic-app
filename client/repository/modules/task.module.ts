@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import type {
+	ICopyTaskForm,
 	ICreateTask,
 	IDeleteTask,
 	ITaskResponse,
@@ -16,6 +17,10 @@ class TaskModule extends HttpFactory {
 
 	createValidationSchema = z.object({
 		name: z.string().min(3, { message: "Title is too short" })
+	})
+
+	updateDescriptionSchema = z.object({
+		description: z.string().min(3, { message: "Description is too short" })
 	})
 
 	async createTask(
@@ -57,6 +62,12 @@ class TaskModule extends HttpFactory {
 		return res
 	}
 
+	async getById(taskId: string): Promise<ITaskResponse> {
+		const res = await this.call<ITaskResponse>("GET", `${this.URL}/${taskId}`)
+
+		return res
+	}
+
 	async updateTaskOrderOnList(
 		projectId: string,
 		data: IUpdateTasksOrderOnList
@@ -66,6 +77,12 @@ class TaskModule extends HttpFactory {
 			`${this.URL}/update-order-list/${projectId}`,
 			data
 		)
+
+		return res
+	}
+
+	async copyTask(projectId: string, data: ICopyTaskForm) {
+		const res = await this.call("PUT", `${this.URL}/copy/${projectId}`, data)
 
 		return res
 	}
