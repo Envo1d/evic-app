@@ -1,8 +1,8 @@
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie"
 
 export enum EnumToken {
-	'ACCESS_TOKEN' = 'access_token',
-	'REFRESH_TOKEN' = 'refresh_token'
+	"ACCESS_TOKEN" = "access_token",
+	"REFRESH_TOKEN" = "refresh_token"
 }
 
 class TokenModule {
@@ -13,8 +13,11 @@ class TokenModule {
 
 	saveTokenStorage = (accessToken: string) => {
 		Cookies.set(EnumToken.ACCESS_TOKEN, accessToken, {
-			domain: 'localhost',
-			sameSite: 'Strict',
+			domain:
+				process.env.NODE_ENV === "production"
+					? process.env.NEXT_PUBLIC_APP_DOMAIN
+					: "localhost",
+			sameSite: "Strict",
 			expires: 1
 		})
 	}
