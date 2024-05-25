@@ -24,7 +24,10 @@ async function bootstrap() {
 	app.use(cookieParser())
 
 	app.enableCors({
-		origin: [configService.get<CorsConfig>('cors').origin],
+		origin:
+			configService.get<AppConfig>('app').node_env === 'production'
+				? [configService.get<CorsConfig>('cors').origin]
+				: ['localhost'],
 		credentials: configService.get<CorsConfig>('cors').credentials,
 		exposedHeaders: 'set-cookie'
 	})

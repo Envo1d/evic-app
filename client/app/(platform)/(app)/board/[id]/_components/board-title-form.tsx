@@ -56,7 +56,6 @@ export function BoardTitleForm({ title, id }: IBoardTitleForm) {
 		mutationKey: ["update project name"],
 		mutationFn: (name: string) =>
 			api.project.updateProject(id, {
-				teamId: activeTeam?.activeTeamId!,
 				name
 			}),
 		onSuccess() {
@@ -70,7 +69,6 @@ export function BoardTitleForm({ title, id }: IBoardTitleForm) {
 	})
 
 	const onSubmit: SubmitHandler<IProjectUpdateForm> = data => {
-		data.teamId = activeTeam?.activeTeamId!
 		mutate(data.name)
 	}
 

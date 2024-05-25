@@ -13,7 +13,12 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
 	const isAuthPage = url.includes("/sign-in") || url.includes("/sign-up")
 
-	const isLandingPage = url === process.env.NEXT_PUBLIC_APP_URL
+	const isLandingPage =
+		!url.includes("/sign-in") &&
+		!url.includes("/sign-up") &&
+		!url.includes("/team") &&
+		!url.includes("/board") &&
+		!url.includes("/team-selection")
 
 	if (isAuthPage && refreshToken)
 		return NextResponse.redirect(new URL(DASHBOARD_PAGES.HOME, url))
@@ -28,14 +33,13 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 	if (isLandingPage && refreshToken)
 		return NextResponse.redirect(new URL(DASHBOARD_PAGES.HOME, url))
 
-	if (isLandingPage)
-		return NextResponse.next({
-			request: {
-				headers: requestHeaders
-			}
-		})
-
 	if (!refreshToken) {
+		if (isLandingPage)
+			return NextResponse.next({
+				request: {
+					headers: requestHeaders
+				}
+			})
 		return NextResponse.redirect(new URL("/sign-in", request.url))
 	}
 
@@ -52,6 +56,7 @@ export const config = {
 		"/team/:path*",
 		"/sign-in/:path",
 		"/sign-up/:path",
+		"/board/:path",
 		"/team-selection/:path"
 	]
 }

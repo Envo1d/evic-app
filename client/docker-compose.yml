@@ -1,0 +1,9 @@
+services:
+  next-client:
+    image: next-client
+    container_name: next-client
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env

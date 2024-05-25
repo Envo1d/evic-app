@@ -98,7 +98,10 @@ export class AuthService {
 
 		res.cookie(this.REFRESH_TOKEN_NAME, refreshToken, {
 			httpOnly: true,
-			domain: this.config.get<AppConfig>('app').domain,
+			domain:
+				this.config.get<AppConfig>('app').node_env === 'production'
+					? this.config.get<AppConfig>('app').domain
+					: 'localhost',
 			expires: expiresIn,
 			secure: this.config.get<AppConfig>('app').secure,
 			sameSite: this.config.get<AppConfig>('app').cookie_same_site
@@ -108,7 +111,10 @@ export class AuthService {
 	removeCookie(res: Response) {
 		res.cookie(this.REFRESH_TOKEN_NAME, '', {
 			httpOnly: true,
-			domain: this.config.get<AppConfig>('app').domain,
+			domain:
+				this.config.get<AppConfig>('app').node_env === 'production'
+					? this.config.get<AppConfig>('app').domain
+					: 'localhost',
 			expires: new Date(0),
 			secure: this.config.get<AppConfig>('app').secure,
 			sameSite: this.config.get<AppConfig>('app').cookie_same_site
