@@ -4,6 +4,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { FetchError } from "ofetch"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -43,6 +44,9 @@ export function Register() {
 			toast.success("Successfully login!")
 			form.reset()
 			push("/team-selection")
+		},
+		onError(err) {
+			if (err instanceof FetchError) toast.error(err.data.message)
 		}
 	})
 
