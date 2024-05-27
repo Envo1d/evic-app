@@ -175,7 +175,7 @@ export function Profile() {
 										</DropdownMenuPortal>
 									</DropdownMenuSub>
 								) : (
-									<DropdownMenuItem onClick={() => push("/team-selection")}>
+									<DropdownMenuItem>
 										<UserPlus className="mr-2 h-4 w-4" />
 										<span>Invitations</span>
 									</DropdownMenuItem>
