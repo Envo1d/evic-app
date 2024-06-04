@@ -10,7 +10,7 @@ import {
 export class UpdateOrderDto {
 	@IsArray()
 	@IsObject({ each: true })
-	@ArrayMinSize(2)
+	@ArrayMinSize(1)
 	tasks: TaskData[]
 }
 
